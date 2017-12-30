@@ -1,0 +1,6 @@
+NAV_HOME = ''
+NAV_ABOUT = 'active'
+
+PREVIOUS = '#'
+NEXT = '#'
+PRINT = './about_print.html'

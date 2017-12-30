@@ -1,0 +1,6 @@
+NAV_HOME = ''
+NAV_BOOKS = 'active'
+
+PREVIOUS = '#'
+NEXT = '#'
+PRINT = './books_print.html'

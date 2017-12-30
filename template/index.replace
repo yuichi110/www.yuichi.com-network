@@ -1,0 +1,3 @@
+PREVIOUS = '#'
+NEXT = '001.html'
+PRINT = './index_print.html'

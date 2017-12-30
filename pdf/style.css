@@ -1,0 +1,14 @@
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  #line-height: 1.42857143;
+  #color: #333;
+  background-color: #fff;
+}
+
+h1 {
+  page-break-before: always;
+}
+
+h2 {
+  page-break-before: always;
+}

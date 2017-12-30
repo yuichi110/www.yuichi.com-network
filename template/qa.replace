@@ -1,0 +1,6 @@
+NAV_HOME = ''
+NAV_QA = 'active'
+
+PREVIOUS = '#'
+NEXT = '#'
+PRINT = './qa_print.html'

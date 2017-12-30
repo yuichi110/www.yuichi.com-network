@@ -1,0 +1,421 @@
+/*
+Colors
+
+Midnight Blue : #2c3e50
+ - navi background
+ - text
+
+Silver : #bdc3c7
+ - Navi text (Highlight is white)
+ - Footer text
+
+Concrete : #95a5a6
+ - Table of contents. Border
+
+Asbestos : #7f8c8d
+ - Table of contents. Icon.
+
+Belize Hole : #2980b9
+ - Link.
+ - Blue high light.
+*/
+
+@font-face {
+  font-family: 'avenger';
+  src: url(/fonts/avenger.ttf);
+}
+
+body {
+  background-image:url(../images/background-not-free.jpg);
+  background-size: 480px;
+  font-family: "Mplus 1p";
+}
+
+/* Make background color transparent */
+.backgroundLayer{
+  background-color:	rgba(255,255,255,0.8);
+}
+
+/*
+ * Navbar
+ */
+
+.navbar {
+   position: relative;
+   min-height: 40px;
+   margin-bottom: 20px;
+   border: 1px solid transparent;
+}
+
+.navbar-inverse {
+  background-color: #2c3e50;
+}
+
+.navbar-fixed-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse {
+     max-height: 200px;
+}
+
+
+.navbar-brand {
+   float: left;
+   height: 40px;
+   padding: 20px 20px;
+   font-size: 20px;
+   line-height: 24px;
+}
+
+ .navbar-nav > li > a {
+   padding-top: 10px;
+   padding-bottom: 0;
+   line-height: 0;
+ }
+
+ .navbar-inverse .navbar-nav > .active > a:hover {
+   background-color: #2c3e50;
+   color: #ffffff;
+ }
+
+ .navbar-inverse .navbar-nav > li > a:hover {
+   background-color: #2c3e50;
+   color: #ffffff;
+ }
+
+.navbar-toggle {
+  position: relative;
+  float: right;
+  padding: 9px 10px;
+  margin-top: 10px;
+  margin-right: 15px;
+  margin-bottom: 10px;
+  background-color: transparent;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+.navbar-inverse .navbar-toggle {
+  border-color: #bdc3c7;
+}
+.navbar-inverse .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
+  background-color: #2c3e50;
+}
+.navbar-inverse .navbar-toggle .icon-bar {
+  background-color: #bdc3c7;
+}
+
+/*
+Header
+*/
+
+.u1-header {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.u1-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 60px;
+  font-family: 'Roboto';
+  font-weight: normal;
+  color: #2c3e50;
+}
+.u1-description {
+  font-size: 20px;
+  color: #7f8c8d;
+}
+
+/*
+ * Main column
+ */
+
+@media (min-width: 1200px) {
+  .container {
+    width: 1200px;
+  }
+}
+
+.u1-main {
+  font-size: 18px;
+  line-height: 1.5;
+  color: #2c3e50;
+}
+
+.u1-main p{
+  margin:1em 0;
+}
+
+/*
+Table of contents
+*/
+
+#toc_container{
+ margin-top:35px; /* 目次の上のスペースの幅*/
+ margin-bottom:35px; /* 目次の下のスペースの幅*/
+ border-radius: 0px; /*角を丸める場合は設定*/
+ font-size: 18px; /*目次内の文字の大きさ*/
+ padding-right: 20px; /*右端から20pxはなす */
+ padding-left: 20px; /*左端から20pxはなす */
+ padding-bottom: 10px; /*下端から20pxはなす */
+ background-color: #ffffff; /*目次ボックスの背景色*/
+ border: 6px solid #95a5a6; /*ボックスの外枠の設定*/
+}
+
+#toc_container .toc_title{
+ font-size: 20px; /*目次タイトルの文字の大きさ*/
+ color: #2c3e50; /*目次タイトルの文字の色*/
+ text-align: center;  /*目次タイトルを中央に配置*/
+}
+
+/*目次タイトルの前のファイルみたいな記号を入れる設定*/
+#toc_container .toc_title:before{
+ content: "\f0f6";
+ font-family: FontAwesome;
+ padding-right: 6px;
+ color: #7f8c8d;
+}
+
+#toc_container ul{
+ counter-reset:number; /*目次番号が増えるよう設定*/
+ list-style:none; /*目次番号以外の記号は表示させない*/
+}
+
+#toc_container ul li{
+ line-height: 1.25em; /*項目の高さ*/
+ margin-bottom: 0.5em; /*項目間の幅*/
+ margin-left:16px; /*目次の各項目の始まりを左端から離す*/
+}
+
+#toc_container ul li:before{
+ counter-increment: number; /*項目の始めの数字をつける*/
+ content: counter(number);
+ font-weight: normal;
+ color: #069;
+ padding-right:12px; /*数字と目次項目の幅を広げたいときはここを調整*/
+ margin-left:-20px;
+}
+
+#toc_container ul li a{
+ font-weight: normal; /*目次項目の文字を太字に*/
+ color: #2980b9; /*目次項目の文字の色*/
+}
+
+#toc_container ul ul{
+ margin-top: 0.5em; /*2レベル目の項目の上スペース幅の設定*/
+}
+
+#toc_container ul ul li{
+ line-height: 1.25em; /*2レベル目の項目の高さ*/
+ margin-bottom: 0.5em; /*2レベル目の項目の下の幅*/
+}
+
+#toc_container ul ul li:before{
+ content: "\f0da"; /*三角マークを入れる*/
+ font-family: FontAwesome;
+ padding-right: 6px;
+ margin-left:0px;
+ color: #7f8c8d;
+ margin-left:-65px; /*2レベル目を左からどこに配置するのか*/
+}
+
+#toc_container ul ul li a{
+ color: #2c3e50; /*2レベル目の項目の文字色*/
+ font-weight: normal; /*2レベル目の項目の文字は太字にしない*/
+ padding-right:6px; /*2レベル目の項目を右端から離す*/
+}
+
+
+/*
+Heading
+*/
+
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4 {
+  margin-top: 0;
+  font-weight: normal;
+  color: #2c3e50;
+  font-family: "Mplus 1p";
+}
+
+h1 {
+  padding: 0.5em 0;
+  border-top: solid 3px #2980b9;
+  border-bottom: solid 3px #2980b9;
+}
+
+h2{
+  padding: 0.5em 0.5em;
+  background: #ffffff;
+  border-left: solid 6px #2980b9;
+  color: #2980b9;
+  margin:1em 0;
+}
+
+h3:before{
+  font-family: FontAwesome;
+  content: "\f24d";
+  position: absolute;
+  font-size: 1.4em;
+  left: 0.2em;
+  top: -0.2em;
+  color: #2980b9;
+}
+
+h3{
+  position: relative;
+  padding-left: 2.2em;
+  line-height: 1.4;
+  margin:0.5em 0;
+}
+
+h4:before{
+  font-family: FontAwesome;
+  content: "\f1db";
+  position: absolute;
+  font-size: 1em;
+  left: 0.2em;
+  /*top: -0.2em;*/
+  color: #2980b9;
+}
+
+h4{
+  position: relative;
+  padding-left: 1.5em;
+  line-height: 1.4;
+  margin:0.5em 0;
+}
+
+/*
+ * Sidebar modules for boxing content
+ */
+
+.sidebar-module {
+  padding: 15px;
+  margin: 0 -15px 15px;
+}
+
+.sidebar-module-inset {
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.sidebar-module-inset p:last-child,
+.sidebar-module-inset ul:last-child,
+.sidebar-module-inset ol:last-child {
+  margin-bottom: 0;
+}
+
+
+/* Pagination */
+
+.pager {
+  margin-bottom: 60px;
+  text-align: left;
+}
+.pager > li > a {
+  width: 140px;
+  padding: 10px 20px;
+  text-align: center;
+  border-radius: 30px;
+}
+
+
+/*
+ * Blog posts
+ */
+
+.blog-post {
+  margin-bottom: 60px;
+}
+.blog-post-title {
+  margin-bottom: 5px;
+  font-size: 40px;
+}
+.blog-post-meta {
+  margin-bottom: 20px;
+  color: #999;
+}
+
+/*
+ * Footer
+ */
+
+.u1-footer {
+  padding: 40px 0;
+  color: #bdc3c7;
+  text-align: center;
+  background-color: #2c3e50;
+}
+
+.u1-footer p:last-child {
+  margin-bottom: 0;
+}
+
+
+
+
+/* side bar */
+
+.u1-sidebar .sidebar-heading {
+  font-size: 24px;
+  color: #2980b9;
+  border-bottom: solid 3px #2980b9;
+}
+
+
+.row{background-image:url(../images/bottom.png);background-position:bottom;background-repeat: no-repeat;}
+
+.u1-img{background-color:#ffffff;}
+/*.img-responsive{margin:0 auto;padding:1em 0; }*/
+.pager{padding:4em 0;text-align: center;}
+.pager li{display: inline;margin-right:2em;}
+.pager-next{margin-right:0;}
+.pager a{color:#000000;}
+.list-unstyled li{margin:4px 1em;list-style-type:disc;}
+.list-unstyled a{color:#000000;}
+.list-unstyled a:hover{color:#666666;}
+.list-unstyled a:focus{color:#000000;}
+
+.print a{
+  margin-bottom:2em;
+  display:block;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  background-color:#ffffff;
+  color:#000000;
+  text-align:center;
+}
+.print a:hover{background-color:#eeeeee;}
+
+
+/*SNS*/
+.social-buttons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.social-buttons:after {
+  overflow: hidden;
+}
+.social-buttons li {
+  float: left;
+  margin: 0 10px 10px 0;
+  height:26px;
+  padding: 0;
+}
+iframe.twitter-share-button {
+  margin-bottom: 0;
+}
+iframe.hatena-bookmark-button-frame {
+  margin-bottom: 0;
+}
+div#___plusone_0 {
+  width: 60px !important;
+}
+.fb-like {
+  line-height: 1;
+}
