@@ -9,11 +9,10 @@
   <meta content="Sample Description" name="description" />
   <meta content="Yuichi Ito" name="author" />
 
-  <link href="./asset/favicon.ico" rel="icon" />
   <title>
-
     {{ TITLE }}
   </title>
+  <link rel="shortcut icon" href="/img/favicon.ico">
 
   <!-- Bootstrap -->
   <link href="./assets/css/bootstrap.css" rel="stylesheet" />
