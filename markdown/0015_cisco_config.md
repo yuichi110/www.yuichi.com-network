@@ -1,11 +1,11 @@
-# Cisco機器の設定方法
+# Cisco機器の操作方法
 
 {{ TOC }}
 
 ## 概要
 
 
-## 特徴
+## 操作方法
 
 本サイトではネットワークの動きを実際に機器を操作しながら学びます。
 ページが取り扱う項目に応じた具体的な設定方法は各ページで説明しますが、
@@ -21,13 +21,14 @@ VIRLの詳細については別ページ(作成中)にて紹介しています�
 機器の設定を加えるには、その機器にログインする必要があります。
 Ciscoのルーターやスイッチも同様で、この両者に違いはありません。
 
-ログイン方法として「コンソールに直結したログイン」と「SSHやTelnetを使ったリモートからのログイン」の2種類があります。
+ログイン方法として「コンソールに直結したログイン」と
+「SSHやTelnetを使ったリモートからのログイン」の2種類があります。
 
 ![image](./0010_image/02.png)
 
 シスコの機器は「コンソールポート」と呼ばれるポートを持っています。
 コンソールポートの見た目はLANケーブルをさすポートと同じかたちなので大差ありませんが、
-ポート上に「Console」などと書かれています。
+ポートの上か下に「Console」などと書かれています。
 
 このポートに「片側がRJ45となるシリアルケーブル」をさし、
 操作する機器側にシリアルポートをさせば操作機器とCiscoの機器が接続されます。
@@ -41,9 +42,9 @@ Ciscoのルーターやスイッチも同様で、この両者に違いはあり
 Cisco側のデフォルトは9600bpsですので、操作端末側も同じ9600を設定します。
 
 コンソールを使った操作は機器のコンソールに直結する必要があり若干面倒なため、
-初期設定でリモートログインできるようにしたあとはSSHを使って機器に接続することが一般的です。
-現在のCisco機器で暗号化されていないTelnetを使う理由は特にないため、
-特別な理由がない限りはSSHのみを使うようにしてください。
+初期設定でリモートログインできるようにしたあとは「SSHを使って機器に接続することが一般的」です。
+現在のCisco機器で暗号化されていないTelnetを使う理由はないため、
+可能な限りはSSHのみを使うようにしてください。
 
 ### モード
 
@@ -76,16 +77,18 @@ Ciscoの機器はUnixやLinuxなどと同じようにコマンド(CLI)で操作�
 インターフェースやルーティングプロトコルなどの管理単位で分かれています。
 
 
+## 構成図
+
+本ページでは以下のような構成を使います。
+
+![image](./0010_image/01.png)
+
+
 ## 初期設定
 
-Cisco機器の操作に不慣れなかたもいると思いますので、
-ここではPCとして使用するルータにIPを設定するという手順をステップごとに説明します。
-本書はCiscoのネットワーク機器のシミュレーターであるVIRLを利用することを前提としていますが、
-実機での操作も大差ありません。
-VIRLのセットアップや基本的な操作方法については巻末の補足「Cisco VIRL」に記載しております。
-
-まずCiscoのIOSの機器(ルーターとスイッチ)を初回起動すると、
+Ciscoのルーター(スイッチも同じ)にコンソールを接続して初回起動すると、
 設定が何もされていないのでダイアログ(質問形式)で設定をするかと聞かれます。
+
 今回は手動で入力していきますので、「no」と回答し、エンターボタンで次に進みます。
 
 ```text
@@ -95,21 +98,111 @@ Would you like to enter the initial configuration dialog? [yes/no]: no
 Press RETURN to get started!
 ```
 
+コンソールログインはデフォルトではパスワードを求められません。
+先に説明した一般ユーザーモードとしてログインされます。
+
+```text
+Router>
+```
+
+一般ユーザーモードにいるか管理者モードにいるかはプロンプトで分かります。
+機器名の横に「>」がプロンプトとして表示されていれば、一般ユーザーモードとして動作しています。
+
+一般ユーザーは機器に影響を与える操作はできませんが、
+機器の状態が確認されるのがセキュリティ的に望ましく場合は、
+パスワードの設定をすることが推奨されます。
+
 
 ## モードの移行方法
 
-先に説明した一般ユーザーモードとしてログインされますので、
-「enable」コマンドで管理者モードに移ります。
-ユーザープロンプト「>」「#」で、一般ユーザモードか管理者モードかが区別できます。
+### 一般ユーザーから管理者モード
+
+管理者として操作をするには、一般ユーザーモードから管理者モードに移行する必要があります。
+管理者モードに移行するには「**enable**」コマンドを使います。
 
 ```text
 Router>enable
 Router#
 ```
 
-管理者モードで機器の設定や状態を確認する場合は「show」コマンドを使います。
-showに続けて決められた単語を並べることで、目的に応じた内容を得られます。
-showコマンドにも体系がありますが、とりあえず使うことを優先して細かな説明は省きます
+プロンプトが一般ユーザーモードの「>」から、管理者モードの「#」に変わりました。
+
+### 管理者モードから一般ユーザーモード
+
+管理者モードから一般ユーザーモードに移るには
+
+### 管理者モードから設定モード
+
+次にルーターの設定をします。
+管理者モードから設定モードに移行するには「**configure terminal**」コマンドを入力します。
+そうするとプロンプトが代わり、機器の設定ができるようになりました。
+
+```text
+Router# configure terminal
+Router(config)#
+```
+
+### 設定モード間の移動と管理者モードへの戻り方
+
+「**interface <設定したいインターフェース名>**」とすることで、
+設定モードから「インターフェース設定モード」に移ります。
+
+```text
+R1(config)#interface GigabitEthernet0/1
+R1(config-if)#
+```
+
+設定が完了したので、設定モードから管理者モードに戻ります。
+「**exit**」コマンドで設定モードから1階層戻るという動きをし、
+「**end**」コマンドで一気に管理者モードまで戻るという動作をします。
+
+```text
+R1(config-if)#exit
+R1(config)#end
+R1#
+*Oct 25 00:15:17.728: %SYS-5-CONFIG_I: Configured from console by console
+```
+
+
+## showコマンドでの状態確認
+
+バージョンの確認
+
+### コマンドの補完と省略
+
+showコマンドや設定コマンドはタブを押すことで補完したり、候補を確認できます。
+
+```text
+
+```
+
+現在の入力が完全なものでなくても、入力される候補が複数無ければ動作します。
+
+```text
+```
+
+
+### doコマンド
+
+設定モードに入るとshowコマンドで状態確認ができなくなります。
+
+```text
+サンプル
+```
+
+doコマンドに続けてshowコマンドを続けることで、この制約が解除できます。
+
+```text
+サンプル
+```
+
+ただ、doコマンドを使っているとコマンドの補完ができません。
+コマンドを完全に覚えていない場合は管理者モードに戻ってshowコマンドを実施してください。
+
+
+### インターフェースの一覧確認
+
+showコマンドにも体系がありますが、とりあえず使うことを優先して細かな説明は省きます。
 「show ip interface brief」コマンドでルーターのインターフェースの一覧を得ます。
 
 ```text
@@ -123,32 +216,59 @@ GigabitEthernet0/1         unassigned      YES unset  administratively down down
 状態が「administratively down(明示的にdownさせている)」となっています。
 VIRLではG0/0のインターフェースは機器の管理用に作成されているため、
 トポロジには表示されていません。
-使いませんので本書では全てシャットダウンしておきます。
+
+「configure terminal」で設定モードに入るとshowコマンドで状態確認ができなくなります。
+
+### インターフェースの状態確認
+
+show int XXXXX
 
 
 
-次にルーターの設定をします。
-管理者モードから設定モードに移行するには「configure terminal」コマンドを入力します。
-そうするとプロンプトが代わり、機器の設定ができるようになりました。
-この状態では先ほどのshowコマンドは使えません。
+## 機器の設定
 
-ホスト名の変更は「hostname <ホスト名>」というコマンドを使います。
+管理者モードで「configure terminal」で
+設定モードで設定を加えて、もういちど確認をしたい場合は管理者モードに戻って操作をします。
+
+### グローバルコンフィグ
+
+ホスト名の変更は「**hostname <ホスト名>**」というコマンドを使います。
 全ての機器の名前が同じだと区別がしにくいため、図と同じ名前であるPC1を設定します。
 プロンプトに表示されていたホスト名が変更されました。
 
 ```text
-Router# configure terminal
 Router(config)#hostname PC1
 PC1(config)#
 ```
 
+### 設定モード間の移行
+
 次にこのルーターのインターフェースにIPアドレスを与えます。
-「interface <設定したいインターフェース名>」とすることで、
+「**interface <設定したいインターフェース名>**」とすることで、
 設定モードから「インターフェース設定モード」に移ります。
-そして「ip address <IPアドレス> <サブネットマスク>」とすることで、
+
+```text
+R1(config)#interface GigabitEthernet0/1
+R1(config-if)#
+```
+
+設定が完了したので、設定モードから管理者モードに戻ります。
+「**exit**」コマンドで設定モードから1階層戻るという動きをし、
+「**end**」コマンドで一気に管理者モードまで戻るという動作をします。
+
+```text
+R1(config-if)#exit
+R1(config)#end
+R1#
+*Oct 25 00:15:17.728: %SYS-5-CONFIG_I: Configured from console by console
+```
+
+### インターフェース設定モード
+
+そして「**ip address <IPアドレス> <サブネットマスク>**」とすることで、
 ルーターのインターフェースにIPをふることができます。
 こちらも図の通りに設定しています。
-インターフェースが「admin shut」ですので「no shutdown」でインターフェースをアップさせます。
+インターフェースが「admin shut」ですので「**no shutdown**」でインターフェースをアップさせます。
 
 ```text
 R1(config)#interface GigabitEthernet0/1
@@ -157,19 +277,12 @@ R1(config-if)#no shutdown
 R1(config-if)#
 *Oct 25 00:14:33.986: %LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to up
 *Oct 25 00:14:34.986: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/1, changed state to up
-```
-
-ルーターからインターフェースがアップしたという旨のメッセージが得られました。
-設定が完了したので、設定モードから管理者モードに戻ります。
-「exit」コマンドで設定モードから1階層戻るという動きをし、
-「end」コマンドで一気に管理者モードまで戻るという動作をします。
-
-```text
-R1(config-if)#exit
-R1(config)#end
+R1(config-if)#end
 R1#
 *Oct 25 00:15:17.728: %SYS-5-CONFIG_I: Configured from console by console
 ```
+
+ルーターからインターフェースがアップしたという旨のメッセージが得られました。
 
 再度、インターフェースの状態を「show ip interface brief」コマンドで確認します。
 各コマンドで使われる単語は他に被る単語がない状態であれば、省略可能です。
@@ -187,6 +300,10 @@ GigabitEthernet0/1         10.0.1.101      YES manual up                    up
 様々なコマンドを打つことで設定はルーターやスイッチに適用されていきますが、
 設定を保存しないと再起動をした際に更新した設定が全て消えています。
 
+## 設定の確認と保存
+
+Ciscoのルーターやスイッチは「**startupコンフィグ**」と「**runningコンフィグ**」を持っています。
+
 ```text
 R1#write
 Building configuration...
@@ -200,39 +317,23 @@ R1#
 名前とIPを変えた同じ設定をPC2とPC3にも加えて下さい。
 
 最後にスイッチの設定を変更します。
-スイッチの設定もルーターとほとんど同じですので、スイッチ名を「S1」に変更します。
 
-ルーターはインターフェースがデフォルトでAdmin Downになっていたのに対して、
-スイッチはデフォルトでアップになっています。
-先に申したように管理用のG0/0のインタフェースは使わないので、
-これだけ明示的に「shutdown」コマンドでダウンさせておきます。
+## 通信テストをするコマンド
+
+### ping
 
 ```text
-Switch>en
-Switch#show ip int bri
-Interface              IP-Address      OK? Method Status                Protocol
-GigabitEthernet0/0     unassigned      YES unset  up                    up      
-GigabitEthernet0/1     unassigned      YES unset  up                    up      
-GigabitEthernet0/2     unassigned      YES unset  up                    up      
-GigabitEthernet0/3     unassigned      YES unset  up                    up  
-
-Switch#conf t
-Enter configuration commands, one per line.  End with CNTL/Z.
-Switch(config)#hostname S1
-S1(config)#int g0/0
-S1(config-if)#shut
-S1(config)#end
-S1#show ip int bri
-Interface              IP-Address      OK? Method Status                Protocol
-GigabitEthernet0/0     unassigned      YES unset  administratively down down    
-GigabitEthernet0/1     unassigned      YES unset  up                    up      
-GigabitEthernet0/2     unassigned      YES unset  up                    up      
-GigabitEthernet0/3     unassigned      YES unset  up                    up      
-
-S1#write
+R1#ping 10.0.1.102
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.0.1.102, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 4/4/5 ms
 ```
 
-以上で全ての機器の設定が完了しました。
+### traceroute
+
+
+
 
 ### 通信をさせる
 
@@ -243,13 +344,8 @@ PC1(192.168.0.101)からPC2(192.168.0.102)へPingで疎通確認をすると、
 「!」が表示されて問題なく応答が得られていることがわかります。
 参考までに存在しないIPである192.168.0.104にPingをすると、期待通りに応答が得られないことがわかります。
 
-```text
-R1#ping 10.0.1.102
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.0.1.102, timeout is 2 seconds:
-.!!!!
-Success rate is 80 percent (4/5), round-trip min/avg/max = 4/4/5 ms
 
+```
 R1#ping 10.0.1.104
 Type escape sequence to abort.
 Sending 5, 100-byte ICMP Echos to 10.0.1.104, timeout is 2 seconds:
