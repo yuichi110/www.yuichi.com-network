@@ -1,371 +1,197 @@
+# ルーティングその他
 
-# 経路集約
+## 経路選択アルゴリズム
 
-ルーティングプロトコルを使うことでルーター同士がお互いに経路情報を交換するため、
-簡単に複雑なネットワークでパケット転送がうまくいく状態にできます。
-ただ、そのようなネットワークの設計は間違っているため、通常は「経路集約」を念頭においたネットワークの設計をします。
+ルーティングテーブルにおいて「0.0.0.0/0」のデフォルトルートより、
+宛先「10.0.0.100」は「10.0.0.0/8」の経路が優先されます。
+このようにルーティングテーブルのエントリには優先度があり、
+複数の経路の選択肢がある場合は最も優先度が高いものが選ばれます。
+
+経路選択の優先度は以下の順序で決まります。
+
+0. プレフィックス長の比較
+0. AD値の比較
+0. メトリックの比較
+
+プレフィックス長の比較で優先度が同じであれば、AD値の比較に移る。
+AD値の比較でも優先度が同じであればメトリックの比較をするという流れです。
+メトリックも同じであった場合にどうなるかはプロトコル及び設定次第ですが、
+一般的にはどれか一つのルートを使うか、ロードバランス(全て使う)するかのどちらかです。
+
+それぞれの比較方式について説明します。
+
+### プレフィックス長の比較
+
+経路選択においていちばん重要なルールは「経路がより詳細に指定されているエントリを優先する」というものです。
+具体的にはサブネットマスクの長さ(プレフィックス長)が長いものを、短いものより優先するということです。
+「10.1.0.0/16」のネットワークへのルーティングは「10.0.0.0/8」よりも「10.1.0.0/16」のエントリを優先します。
+
+![image](./0010_image/01.png)
+
+実際にスタティックルートとTracerouteを使って、この動きを確認します。
+
+
+```text
+ルーティングテーブルの表示
+```
+
+```text
+Tracerouteの表示
+```
+
+### AD値の比較
+
+経路学習には様々な手法やプロトコルがあります。
+たとえば管理者が手動で設定するスタティックルートや、OSPFによる自動学習などです。
+
+これらの経路の学習元(ソース)には信頼性が設定されており、
+それは「**AD値(Administrative Distance)**」と呼ばれています。
+スタティックルートにもOSPFにもAD値が設定されており、
+同じ経路を複数のソースから学習していた際は、ソースのAD値を比較することでどのルートを使うかを決めます。
+AD値は「**値が低いものが優先される**」というルールがあります。
+
+CiscoのルーターにおけるデフォルトのAD値は以下のようになっています。
+学んでいないプロトコルなどもあるので知らないものは無視してもらって構いませんが、
+今まで学んだものだと「直接接続されるネットワーク」「スタティックルート」「OSPF」という順で経路を選択することがわかります。
+なお、AD値の比較よりプレフィックス長の比較の優先度が高いため、
+より細かい経路を学習してしまうと直接接続しているネットワークあての通信だったとしても、
+パケットが他のネットワークに転送されてしまうといったことは発生します。
+
+```text
+接続済み	0
+スタティック	1
+eBGP	20
+EIGRP（内部）	90
+IGRP	100
+OSPF	110
+IS-IS	115
+RIP	120
+EIGRP（外部）	170
+iBGP	200
+EIGRP サマリー ルート	5
+```
+
+このデフォルトのAD値には「自動学習したものより自分で設定したものを優先する」といった常識的なルールが適用されています。
+EIGRPというCisco独自のルーティングプロトコルをOSPFより優先するといった点もありますが、
+組織内で複数のルーティングプロトコルを同時に動かすことは滅多にないため考慮は不要かと思います。
+ただ、BGPは他のルーティングプロトコルと共用されることがあるため、若干注意が必要です。
+
+![image](./0010_image/01.png)
+
+```text
+ルーティングテーブルの表示
+```
+
+```text
+Tracerouteの表示
+```
+
+なお、各ソースのAD値は変更することができます。
+スタティックルートは各エントリごとにAD値を調整することができるので、
+「ルーティングプロトコルにトラブルが起きて経路情報を失った際はここに転送する」といった使い方をまれにします。
+
+AD値を意識しなければいけないようなネットワークを構築することは可能な限り避けて下さい。
+複数のソースで複雑なエントリを構築しているということは、理解しにくいネットワーク構造になっている可能性が高いです。
+
+
+### メトリックの比較
+
+「**メトリック**」は各ルーティングプロトコルの経路選択のルールです。
+各ルーティングプロトコルごとに異なるメトリックのルールを持っているため、OSPFのメトリックはOSPFのなかだけで使われます。
+他のプロトコルとの比較はメトリックではなくAD値で行われます。
+
+メトリックは特定のルーティングプロトコルで組織内で運用する際に重要な役割を果たします。
+複数のルーターが階層的に接続されている状況では、あるネットワークに辿り着く経路が複数ある場合があります。
+メトリックはそういった際に「この経路が良さそうだから、これを使う」といったことを判断する仕組みです。
+
+たとえば以下の図では左側のネットワークから右側のネットワークまで辿り着く経路が上下にあります。
+プレフィックス長も同じで、AD値も共にOSPFなので同じです。
+
+![image](./0010_image/01.png)
+
+ただ、宛先までに辿り着くホップ数が異なっています。
+OSPFのメトリックの細かい計算方法は割愛しますが、
+「高帯域の経路を優先する」「もし同じ帯域ならホップ数が短いものを優先する」というルールを覚えておけば十分です。
+今回の場合は経路の帯域が全て同一ですので、ホップ数が短い上側の経路を選択します。
+もし上側の経路の帯域が下側より少ない(通常は1/10になる)場合は、下側のルートを選びます。
+
+```text
+ルーティングテーブルの表示
+```
+
+```text
+Tracerouteの表示
+```
+
+このように複数の経路で宛先にネットワークにいける場合は片側の経路が障害などで使えなくなったとしても、
+もう片側の経路を使うことができます。
+
+
+## ルート再配送
+
+スタティックルートや複数のルーティングプロトコルを同時に使っている環境では、
+あるソースから学んだ経路を別のソースに対して伝播させることができます。
+この経路情報を異なるプロセスに伝播させることを「**ルート再配送**」と呼びます。
+ルート再配送はスタティックルートやEIGRPの経路情報をOSPFに流すといった使い方はもちろんですが、
+複数のOSPFのプロセス間(OSPFのグループ1、グループ2)で経路情報をやりとりするといった使い方もできます。
+
+ルート再配送が使われるよくあるシナリオとしては、
+組織の中にもいくつかのネットワーク管理グループが分かれていて、
+そのグループ間で経路情報をやりとりしなければいけないといったものです。
+もしくは組織間で使われるBGPで学んだ経路情報を、組織内でOSPFなどとして伝播するといったものです。
+
+![image](./0010_image/01.png)
+
+なお、ルート再配送は積極的に利用するものではありません。
+使わずに済むのであれば、ネットワークの設計を変更するなどして綺麗な構成にすることを推奨します。
+たとえば後述する経路集約をすることを前提としてネットワークを設計すれば、
+組織内の細かいルートを再配送する必要はなくなり、おおまかなルートでグループ間の経路情報を定義できます。
+
+### OSPFのルート再配送
+
+### サンプル
+
+
+
+## 経路集約
+
+経路集約はネットワークの設計に関わる非常に重要な概念です。
 
 経路集約は「連続した小さな複数のネットワーク」を「大きな一つのネットワーク」として外に見せるテクニックです。
 これを使うことでルーティングテーブルに記載されるエントリの数が減らせるので、ネットワークを管理しやすくなります。
 ただ、「連続した」とあるようにネットワークの設計をする際にレンジが近いネットワークアドレスを固める必要があります。
 
-具体例として東京に本社を持ち、日本全国に支店を持つ会社でOSPFを使って経路情報を交換するというシナリオを考えます。
-社内アドレスとして10.0.0.0/8を利用します。
+![image](./0010_image/01.png)
 
-10.0.0.0/8を切り出して、/24のネットワークを必要になったタイミングで各拠点に割りあて、
-足りなくなったら追加で増設するというルールでネットワークの運用をしていたとしましょう。
-すると以下のような社内ネットワークが構築されることになります。
+たとえば上記の図は複数の支店がある会社のネットワークの設計です。
+各支店のアドレスは「10.1.0.0/16」「10.2.0.0/16」「10.3.0.0/16」などと大まかに区切られており、
+支店の中でそのアドレスをやりくりしてネットワークを構築しています。
 
-<<図>>
+このような構成を取ると学習する経路情報は「支店間のルータは各支店の/16のネットワーク」
+「各支店内のルーターは各支店内の細かいルートで、10.0.0.0/8は支店間のルーターに全て任せる」とできます。
+このような構成を取るメリットはまず第一に分かりやすいものとなることがあげられます。
+また、全てのルーターが組織内の全ての経路情報の全てを学習する必要がなくなります。
 
-このようなネットワークを構築すると、それぞれの拠点が持つ全ての/24のネットワークをお互いに教え合う必要があります。
+ネットワークの障害は複雑な構成なネットワークで機器が故障したり設定変更をした際に発生することが多いので、
+シンプルな綺麗な構成を作れば「障害発生確率が減る」「障害発生のインパクトが減る」「復旧にかかる時間が短くなる」といいことずくめです。
 
-一方、各拠点に/16のネットワークを事前に割り当てて、それを拠点内で分割するというルールでネットワークを運用したとします。
+![image](./0010_image/01.png)
 
-<<図>>
+経路集約を実現するテクニックは様々ありますが、よく使われるのは
+「全てを一つのルーティングプロトコルで実現する」
+「集約する境界で別のルーティングプロトコルのプロセスを使う」
+「集約されたルート間はスタティックルートで実現する」
+あたりです。
+昨今だと支店間をVPNで接続して、スタティックルートで本社と支店の間での経路情報を設定するというパターンが多いです。
+支店間の間のデータのやりとりは一旦本社を経由します。
 
-このようなネットワークを作ると経路を集約することができます。
-例えば大阪にあるPCが東京にあるサーバーに通信をする場合、
-大阪にあるルーターは宛先アドレスを見て「10.1.0.0/16」のアドレスであれば、
-とりあえず東京に送って後は東京のルーターに任せるということができます。
+ここではOSPFの経路集約機能を使って、全てをOSPFで実現するという手法を扱います。
 
-
-PC_OKNW1#ping 10.1.1.101
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.1.1.101, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 12/16/25 ms
-PC_OKNW1#ping 10.1.2.102
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.1.2.102, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 12/17/25 ms
-PC_OKNW1#ping 10.2.1.101
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.2.1.101, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 10/13/19 ms
-PC_OKNW1#ping 10.2.2.102
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.2.2.102, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 12/13/16 ms
+### OSPFの経路集約
 
 
-R_TKY1#show ip route
-Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
-       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
-       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
-       E1 - OSPF external type 1, E2 - OSPF external type 2
-       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
-       ia - IS-IS inter area, * - candidate default, U - per-user static route
-       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
-       a - application route
-       + - replicated route, % - next hop override, p - overrides from PfR
+### サンプル構成
 
-Gateway of last resort is not set
-
-      10.0.0.0/8 is variably subnetted, 10 subnets, 2 masks
-C        10.0.0.0/24 is directly connected, GigabitEthernet0/1
-L        10.0.0.1/32 is directly connected, GigabitEthernet0/1
-C        10.1.0.0/24 is directly connected, GigabitEthernet0/2
-L        10.1.0.1/32 is directly connected, GigabitEthernet0/2
-O        10.1.1.0/24 [110/2] via 10.1.0.2, 00:26:48, GigabitEthernet0/2
-O        10.1.2.0/24 [110/2] via 10.1.0.3, 00:27:16, GigabitEthernet0/2
-O IA     10.2.0.0/24 [110/2] via 10.0.0.2, 00:19:00, GigabitEthernet0/1
-O IA     10.2.1.0/24 [110/3] via 10.0.0.2, 00:14:24, GigabitEthernet0/1
-O IA     10.2.2.0/24 [110/3] via 10.0.0.2, 00:14:14, GigabitEthernet0/1
-O IA     10.3.0.0/24 [110/2] via 10.0.0.3, 00:09:59, GigabitEthernet0/1
-
-
-R_OKNW1#show ip route
-Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
-       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
-       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
-       E1 - OSPF external type 1, E2 - OSPF external type 2
-       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
-       ia - IS-IS inter area, * - candidate default, U - per-user static route
-       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
-       a - application route
-       + - replicated route, % - next hop override, p - overrides from PfR
-
-Gateway of last resort is not set
-
-      10.0.0.0/8 is variably subnetted, 10 subnets, 2 masks
-C        10.0.0.0/24 is directly connected, GigabitEthernet0/1
-L        10.0.0.3/32 is directly connected, GigabitEthernet0/1
-O IA     10.1.0.0/24 [110/2] via 10.0.0.1, 00:08:32, GigabitEthernet0/1
-O IA     10.1.1.0/24 [110/3] via 10.0.0.1, 00:08:32, GigabitEthernet0/1
-O IA     10.1.2.0/24 [110/3] via 10.0.0.1, 00:08:32, GigabitEthernet0/1
-O IA     10.2.0.0/24 [110/2] via 10.0.0.2, 00:08:32, GigabitEthernet0/1
-O IA     10.2.1.0/24 [110/3] via 10.0.0.2, 00:08:32, GigabitEthernet0/1
-O IA     10.2.2.0/24 [110/3] via 10.0.0.2, 00:08:32, GigabitEthernet0/1
-C        10.3.0.0/24 is directly connected, GigabitEthernet0/2
-L        10.3.0.1/32 is directly connected, GigabitEthernet0/2
-
-
-R_TKY2#show ip route
-Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
-       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
-       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
-       E1 - OSPF external type 1, E2 - OSPF external type 2
-       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
-       ia - IS-IS inter area, * - candidate default, U - per-user static route
-       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
-       a - application route
-       + - replicated route, % - next hop override, p - overrides from PfR
-
-Gateway of last resort is not set
-
-      10.0.0.0/8 is variably subnetted, 10 subnets, 2 masks
-O IA     10.0.0.0/24 [110/2] via 10.1.0.1, 00:29:33, GigabitEthernet0/1
-C        10.1.0.0/24 is directly connected, GigabitEthernet0/1
-L        10.1.0.2/32 is directly connected, GigabitEthernet0/1
-C        10.1.1.0/24 is directly connected, GigabitEthernet0/2
-L        10.1.1.1/32 is directly connected, GigabitEthernet0/2
-O        10.1.2.0/24 [110/2] via 10.1.0.3, 00:29:33, GigabitEthernet0/1
-O IA     10.2.0.0/24 [110/3] via 10.1.0.1, 00:21:49, GigabitEthernet0/1
-O IA     10.2.1.0/24 [110/4] via 10.1.0.1, 00:17:12, GigabitEthernet0/1
-O IA     10.2.2.0/24 [110/4] via 10.1.0.1, 00:17:01, GigabitEthernet0/1
-O IA     10.3.0.0/24 [110/3] via 10.1.0.1, 00:12:46, GigabitEthernet0/1
-
-
-
-PC_OKNW1#ping 10.1.1.101
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.1.1.101, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 25/37/52 ms
-PC_OKNW1#ping 10.1.2.102
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.1.2.102, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 11/17/31 ms
-PC_OKNW1#ping 10.2.1.101  
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.2.1.101, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 15/27/53 ms
-PC_OKNW1#ping 10.2.2.102
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.2.2.102, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 7/11/14 ms
-
-
-R_OKNW1#show ip route
-Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
-       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
-       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
-       E1 - OSPF external type 1, E2 - OSPF external type 2
-       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
-       ia - IS-IS inter area, * - candidate default, U - per-user static route
-       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
-       a - application route
-       + - replicated route, % - next hop override, p - overrides from PfR
-
-Gateway of last resort is not set
-
-      10.0.0.0/8 is variably subnetted, 7 subnets, 3 masks
-C        10.0.0.0/24 is directly connected, GigabitEthernet0/1
-L        10.0.0.3/32 is directly connected, GigabitEthernet0/1
-O IA     10.1.0.0/16 [110/2] via 10.0.0.1, 00:20:36, GigabitEthernet0/1
-O IA     10.2.0.0/16 [110/2] via 10.0.0.2, 00:17:17, GigabitEthernet0/1
-O        10.3.0.0/16 is a summary, 00:20:36, Null0
-C        10.3.0.0/24 is directly connected, GigabitEthernet0/2
-L        10.3.0.1/32 is directly connected, GigabitEthernet0/2
-
-
-R_TKY1#show ip route     
-Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
-       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
-       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
-       E1 - OSPF external type 1, E2 - OSPF external type 2
-       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
-       ia - IS-IS inter area, * - candidate default, U - per-user static route
-       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
-       a - application route
-       + - replicated route, % - next hop override, p - overrides from PfR
-
-Gateway of last resort is not set
-
-      10.0.0.0/8 is variably subnetted, 9 subnets, 3 masks
-C        10.0.0.0/24 is directly connected, GigabitEthernet0/1
-L        10.0.0.1/32 is directly connected, GigabitEthernet0/1
-O        10.1.0.0/16 is a summary, 00:06:53, Null0
-C        10.1.0.0/24 is directly connected, GigabitEthernet0/2
-L        10.1.0.1/32 is directly connected, GigabitEthernet0/2
-O        10.1.1.0/24 [110/2] via 10.1.0.2, 00:06:03, GigabitEthernet0/2
-O        10.1.2.0/24 [110/2] via 10.1.0.3, 00:06:16, GigabitEthernet0/2
-O IA     10.2.0.0/16 [110/2] via 10.0.0.2, 00:06:16, GigabitEthernet0/1
-O IA     10.3.0.0/16 [110/2] via 10.0.0.3, 00:06:16, GigabitEthernet0/1
-
-
-R_TKY2#show ip route
-Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
-       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
-       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
-       E1 - OSPF external type 1, E2 - OSPF external type 2
-       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
-       ia - IS-IS inter area, * - candidate default, U - per-user static route
-       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
-       a - application route
-       + - replicated route, % - next hop override, p - overrides from PfR
-
-Gateway of last resort is not set
-
-      10.0.0.0/8 is variably subnetted, 8 subnets, 3 masks
-O IA     10.0.0.0/24 [110/2] via 10.1.0.1, 00:05:31, GigabitEthernet0/1
-C        10.1.0.0/24 is directly connected, GigabitEthernet0/1
-L        10.1.0.2/32 is directly connected, GigabitEthernet0/1
-C        10.1.1.0/24 is directly connected, GigabitEthernet0/2
-L        10.1.1.1/32 is directly connected, GigabitEthernet0/2
-O        10.1.2.0/24 [110/2] via 10.1.0.3, 00:05:31, GigabitEthernet0/1
-O IA     10.2.0.0/16 [110/3] via 10.1.0.1, 00:05:31, GigabitEthernet0/1
-O IA     10.3.0.0/16 [110/3] via 10.1.0.1, 00:05:31, GigabitEthernet0/1
-
-# 経路選択アルゴリズム
-
-ルーターが学習する経路情報
-
-ルーティングテーブルを見ただけでどのようにルーティングされるか分かるようなネットワークを作るべきですが、
-
-
- - プレフィックス長
- - AD値
- - メトリック
-
-
-R1#show ip route 10.2.0.0
-Routing entry for 10.2.0.0/24
- Known via "ospf 1", distance 110, metric 3, type inter area
- Last update from 10.0.4.4 on GigabitEthernet0/3, 00:00:49 ago
- Routing Descriptor Blocks:
- * 10.0.4.4, from 10.2.0.1, 00:00:49 ago, via GigabitEthernet0/3
-     Route metric is 3, traffic share count is 1
-R1#
-R1#
-R1#show ip route 10.2.0.0
-Routing entry for 10.2.0.0/24
- Known via "ospf 1", distance 110, metric 4, type inter area
- Last update from 10.0.1.2 on GigabitEthernet0/2, 00:02:59 ago
- Routing Descriptor Blocks:
- * 10.0.1.2, from 10.2.0.1, 00:02:59 ago, via GigabitEthernet0/2
-     Route metric is 4, traffic share count is 1
-
-aa
-
-R1#show ip route 10.2.0.0
-Routing entry for 10.2.0.0/24
-  Known via "static", distance 1, metric 0
-  Routing Descriptor Blocks:
-  * 10.0.4.4
-      Route metric is 0, traffic share count is 1
-
-
-
-
-R1#show ip route 10.2.0.0
-Routing entry for 10.2.0.0/24
-  Known via "ospf 1", distance 110, metric 4, type inter area
-  Last update from 10.0.1.2 on GigabitEthernet0/2, 00:25:25 ago
-  Routing Descriptor Blocks:
-  * 10.0.1.2, from 10.2.0.1, 00:25:25 ago, via GigabitEthernet0/2
-      Route metric is 4, traffic share count is 1
-
-ip route を追加
-
-R1#show ip route
-Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
-       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
-       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
-       E1 - OSPF external type 1, E2 - OSPF external type 2
-       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
-       ia - IS-IS inter area, * - candidate default, U - per-user static route
-       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
-       a - application route
-       + - replicated route, % - next hop override, p - overrides from PfR
-
-Gateway of last resort is not set
-
-      10.0.0.0/8 is variably subnetted, 10 subnets, 2 masks
-C        10.0.1.0/24 is directly connected, GigabitEthernet0/2
-L        10.0.1.1/32 is directly connected, GigabitEthernet0/2
-O        10.0.2.0/24 [110/2] via 10.0.1.2, 01:31:52, GigabitEthernet0/2
-O        10.0.3.0/24 [110/3] via 10.0.1.2, 01:31:32, GigabitEthernet0/2
-C        10.0.4.0/24 is directly connected, GigabitEthernet0/3
-L        10.0.4.1/32 is directly connected, GigabitEthernet0/3
-O        10.0.5.0/24 [110/4] via 10.0.1.2, 01:12:53, GigabitEthernet0/2
-C        10.1.0.0/24 is directly connected, GigabitEthernet0/1
-L        10.1.0.1/32 is directly connected, GigabitEthernet0/1
-S        10.2.0.0/24 [1/0] via 10.0.4.4
-
-ip route を/16変更
-
-R1#show ip route
-Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
-       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
-       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
-       E1 - OSPF external type 1, E2 - OSPF external type 2
-       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
-       ia - IS-IS inter area, * - candidate default, U - per-user static route
-       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
-       a - application route
-       + - replicated route, % - next hop override, p - overrides from PfR
-
-Gateway of last resort is not set
-
-      10.0.0.0/8 is variably subnetted, 11 subnets, 3 masks
-C        10.0.1.0/24 is directly connected, GigabitEthernet0/2
-L        10.0.1.1/32 is directly connected, GigabitEthernet0/2
-O        10.0.2.0/24 [110/2] via 10.0.1.2, 01:44:53, GigabitEthernet0/2
-O        10.0.3.0/24 [110/3] via 10.0.1.2, 01:44:33, GigabitEthernet0/2
-C        10.0.4.0/24 is directly connected, GigabitEthernet0/3
-L        10.0.4.1/32 is directly connected, GigabitEthernet0/3
-O        10.0.5.0/24 [110/4] via 10.0.1.2, 01:25:54, GigabitEthernet0/2
-C        10.1.0.0/24 is directly connected, GigabitEthernet0/1
-L        10.1.0.1/32 is directly connected, GigabitEthernet0/1
-S        10.2.0.0/16 [1/0] via 10.0.4.4
-O IA     10.2.0.0/24 [110/4] via 10.0.1.2, 00:10:27, GigabitEthernet0/2       
-
-PC1#traceroute 10.2.0.102
-Type escape sequence to abort.
-Tracing the route to 10.2.0.102
-VRF info: (vrf in name/id, vrf out name/id)
-  1 10.1.0.1 4 msec 4 msec 3 msec
-  2 10.0.1.2 5 msec 6 msec 7 msec
-  3 10.0.2.3 9 msec 12 msec 8 msec
-  4 10.0.3.5 8 msec 16 msec 7 msec
-  5 10.2.0.102 8 msec 16 msec *
-PC1#traceroute 10.2.0.102
-Type escape sequence to abort.
-Tracing the route to 10.2.0.102
-VRF info: (vrf in name/id, vrf out name/id)
-  1 10.1.0.1 3 msec 3 msec 3 msec
-  2 10.0.4.4 5 msec 3 msec 8 msec
-  3 10.0.5.5 6 msec 8 msec 10 msec
-  4 10.2.0.102 12 msec 8 msec *
-PC1#
-
-PC1#traceroute 10.2.0.102
-Type escape sequence to abort.
-Tracing the route to 10.2.0.102
-VRF info: (vrf in name/id, vrf out name/id)
-  1 10.1.0.1 8 msec 4 msec 2 msec
-  2 10.0.4.4 7 msec 6 msec 5 msec
-  3 10.0.5.5 7 msec 6 msec 11 msec
-  4 10.2.0.102 8 msec 20 msec *
-PC1#
-PC1#
-PC1#traceroute 10.2.0.102
-Type escape sequence to abort.
-Tracing the route to 10.2.0.102
-VRF info: (vrf in name/id, vrf out name/id)
-  1 10.1.0.1 3 msec 5 msec 3 msec
-  2 10.0.1.2 2 msec 5 msec 3 msec
-  3 10.0.2.3 12 msec 5 msec 6 msec
-  4 10.0.3.5 7 msec 4 msec 4 msec
-  5 10.2.0.102 5 msec 9 msec *
 
 
 # コラム
@@ -391,8 +217,3 @@ PCとルーターは同じネットワークに接続されているため、パ
 
 ルーターの転送の仕組みは追って話しますが、ネットワークA,B,Cという構成でネットワークAにいるホストから、
 ネットワークCにいるホストに通信をする場合は以下のようなパケットになります。
-
-<<図>>
-
-
-## ルート再配送
