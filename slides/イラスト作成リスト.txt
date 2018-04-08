@@ -1,0 +1,63 @@
+リアルなイラスト
+ - Switch + SFP + Fiber
+ - Switch + USBシリアル + シリアルケーブル
+ - Switchの正面(Console, Management, Data)
+
+ホームネットワーク
+- バッファローのルーター
+- バッファローのスイッチ
+- iPhone
+- Android
+- iMac
+- プリンタ
+- QNAP NAS
+- ONU (NTT マーク)
+- IP電話
+
+ネットワーク
+- インターネット　アイコン
+- ホームネットワーク
+- カフェネットワーク
+- 会社ネットワーク
+
+企業アイコン
+- Yahoo
+- Yahooトップページ
+- Google
+- Googleトップページ
+- Microsoft(Windows)
+- Apple
+
+ネットワーク機器
+- 中型ルーター
+- 大型ルーター
+- 中型スイッチ
+- 大型スイッチ
+- アクセスポイント(Aironet)
+
+ネットワーク機器アイコン
+- L3スイッチ
+- ロードバランサー
+- ファイアーウォール
+
+ケーブル類
+- RJ45
+- Fiber
+- SFP
+- Twinax
+- Wifiの電波
+- シリアルケーブル
+- USBシリアル
+
+VIRL
+- VIRL
+
+
+キャプチャー
+- Wireshark
+
+状態
+- 王冠(リーダー)
+- 電源ON
+- 電源OFF (電源マークにスラッシュ)
+- メンテナンス (ドライバーとレンチ)
