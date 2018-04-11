@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="ja-JP">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta content="Sample Description" name="description"/>
+  <meta content="Yuichi Ito" name="author"/>
+  <title>
+   Network Boot Camp
+  </title>
+  <link href="/img/favicon.ico" rel="shortcut icon"/>
+  <!-- Bootstrap -->
+  <link href="./assets/css/bootstrap.css" rel="stylesheet">
+   <link href="./assets/css/bootstrap-theme.css" rel="stylesheet"/>
+   <link href="./assets/css/bootstrap_u1.css" rel="stylesheet"/>
+   <!-- Font -->
+   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"/>
+   <link href="https://fonts.googleapis.com/earlyaccess/mplus1p.css" rel="stylesheet">
+    <!-- Code Highlight -->
+    <link href="./assets/css/codehilite_colorful.css" rel="stylesheet"/>
+    <!-- Custom -->
+    <link href="./assets/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="./assets/icomoon/style.css" rel="stylesheet"/>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+   </link>
+  </link>
+ </head>
+ <body>
+  <div class="backgroundLayer">
+   <!-- Fixed navbar -->
+   <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+     <div class="navbar-header">
+      <button aria-controls="navbar" aria-expanded="false" class="navbar-toggle collapsed" data-target="#navbar" data-toggle="collapse" type="button">
+       <span class="sr-only">
+        Toggle navigation
+       </span>
+       <span class="icon-bar">
+       </span>
+       <span class="icon-bar">
+       </span>
+       <span class="icon-bar">
+       </span>
+      </button>
+      <a class="navbar-brand active" href="./">
+       Python
+      </a>
+     </div>
+     <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav">
+       <li class="">
+        <a href="./navi.html">
+         Navi
+        </a>
+       </li>
+       <li class="">
+        <a href="./qa.html">
+         QA
+        </a>
+       </li>
+       <li class="">
+        <a href="./books.html">
+         Books
+        </a>
+       </li>
+       <li style="font-family: avenger">
+        <a href="/">
+         GC
+        </a>
+       </li>
+      </ul>
+     </div>
+    </div>
+   </nav>
+   <div class="container">
+    <div class="u1-header">
+     <a href="./" style=" text-decoration: none;">
+      <div class="u1-title">
+       Network Boot Camp
+      </div>
+      <p class="lead u1-description">
+       ネットワーク構築の訓練プログラム
+      </p>
+     </a>
+    </div>
+    <div class="row">
+     <div class="col-sm-8 u1-main">
+      <!-- GENERATED HTML START -->
+      <!-- GENERATED HTML START -->
+      <h1>
+       VLAN
+      </h1>
+      <div class="no_bullets" id="toc_container">
+       <p class="toc_title">
+        本記事の内容
+       </p>
+       <ul class="toc_list">
+        <li>
+         <a href="#header-1">
+          ネットワークの仮想化
+         </a>
+        </li>
+        <li>
+         <a href="header-2">
+          VLANの作成とポートへの割り当て
+         </a>
+         <ul>
+          <li>
+           <a href="#header-3">
+            VLANの作成
+           </a>
+          </li>
+          <li>
+           <a href="#header-4">
+            インターフェースへのVLANの設定
+           </a>
+          </li>
+          <li>
+           <a href="#header-5">
+            VLAN内の通信の確認
+           </a>
+          </li>
+          <li>
+           <a href="#header-6">
+            VLANとMACアドレステーブル
+           </a>
+          </li>
+         </ul>
+        </li>
+        <li>
+         <a href="#header-7">
+          アクセスポートとトランクポート
+         </a>
+         <ul>
+          <li>
+           <a href="#header-8">
+            トランクポートの設定
+           </a>
+          </li>
+          <li>
+           <a href="#header-9">
+            アラウドVLANの設定
+           </a>
+          </li>
+          <li>
+           <a href="#header-10">
+            ネイティブVLANの設定
+           </a>
+          </li>
+         </ul>
+        </li>
+       </ul>
+      </div>
+      <h2 id="header-1">
+       ネットワークの仮想化
+      </h2>
+      <p>
+       スイッチは同じネットワークに繋がる機器同士を繋げるための機器です。
+なにも設定をしないと、全てのポートに繋がる機器は同じネットワークに属することになります。
+      </p>
+      <p>
+       自宅のようにネットワークがひとつであればこれでも構いませんが、
+企業の場合はネットワークが数多く存在するため、ひとつのスイッチがひとつのネットワークしか扱えないというのは不便です。
+ネットワークが増えれば増えるほど機器の台数が増えて金銭コストもかかりますし、管理しきれなくなります。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0025_image/01.png"/>
+      </p>
+      <p>
+       この問題を解決するためにスイッチには「
+       <strong>
+        VLAN(Virtual LAN)
+       </strong>
+       」と呼ばれる機能があります。
+簡単にいってしまえばスイッチのポートをネットワークごとにグループ分けすることで、
+ひとつのスイッチで複数のネットワークを扱えるようにします。
+      </p>
+      <p>
+       物理的にネットワークごとにスイッチを分ける構成は、
+VLANを使うことで以下のように集約することができます。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0025_image/01.png"/>
+      </p>
+      <p>
+       本ページではこのVLANの仕組みと使い方について順に説明していきます。
+      </p>
+      <h2 id="header-2">
+       VLANの作成とポートへの割り当て
+      </h2>
+      <p>
+       VLANのグループには「VLAN1からVLAN4096まで」が存在しており、
+各ポートはそのうちのひとつか複数のVLANに属しています。
+このグループは「VLAN ID」や「VLAN番号」などと呼ばれています。
+たとえば「VLAN ID 1」や「VLAN番号100」などです。
+      </p>
+      <p>
+       各ポートに設定されているデフォルトのVLANはVLAN1であるため、
+設定変更されていなければ全てのポートが同じネットワーク(VLAN1)に属しています。
+つまり家庭用スイッチと同じように繋がる機器は全て通信可能ということです。
+      </p>
+      <p>
+       ポートが属するVLANをVLAN1からVLAN100に変えれば、
+VLAN1に繋がる機器とVLAN100に繋がる機器は直接通信することはできなくなります。
+他にもVLAN100のポートを作れば、VLAN100のポートに繋がる機器同士では通信をすることができます。
+      </p>
+      <p>
+       以下のように構成変更をすることでVLANの特徴を確認します。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0025_image/01.png"/>
+      </p>
+      <p>
+       もともと全てのポートがデフォルトのVLAN1に属しているものを、
+新しくVLAN2を作って、ポートをVLAN2に属させます。
+VLAN1とVLAN2はどちらもネットワークのアドレスとしては同じですが、
+L2セグメントが異なるため通信できなくなります。
+      </p>
+      <p>
+       なお、本来はL2セグメントが異なれば異なるネットワークアドレスを使う必要があります。
+あくまでも実験的なネットワーク構成だですので注意願います。
+      </p>
+      <h3 id="header-3">
+       VLANの作成
+      </h3>
+      <p>
+       VLAN1以外のVLANを利用するには、そのVLANを作成して、
+各ポートが属するVLANを変更する必要があります。
+      </p>
+      <p>
+       まずVLANを使うためにはVLANを作る必要があります。
+これには「vlan
+       <vlan番号コマンド>
+        」を使います。
+       </vlan番号コマンド>
+      </p>
+      <h4>
+       VLANの作成
+      </h4>
+      <div class="codehilite">
+       <pre><span></span>S1(config)# vlan 2
+S1(config-vlan)# end
+</pre>
+      </div>
+      <p>
+       存在するVLANを確認するためには「show vlan」コマンドを使います。
+このコマンドはどのVLANにどのポートが属しているかも表示してくれます。
+      </p>
+      <h4>
+       VLANの確認
+      </h4>
+      <div class="codehilite">
+       <pre><span></span>S1# show vlan
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Gi0/0, Gi0/1, Gi0/2, Gi0/3
+                                                Gi1/0
+2    VLAN0002                         active    
+</pre>
+      </div>
+      <p>
+       存在する全てのポートがデフォルトのVLAN1に属していて、
+VLAN2にはどのポートも属していません。
+      </p>
+      <h3 id="header-4">
+       インターフェースへのVLANの設定
+      </h3>
+      <p>
+       先の構成を作るために、G0/3とG1/0の2つのポートをVLAN2に加えます。
+これにはインターフェース設定モードにて「switchport access vlan
+       <vlan番号>
+        」を使います。
+今回ですと以下のようになります。
+       </vlan番号>
+      </p>
+      <h4>
+       インターフェースへのVLAN設定
+      </h4>
+      <div class="codehilite">
+       <pre><span></span>S1(config)#int g0/3
+S1(config-if)#switchport access vlan 2
+S1(config-if)#int g1/0
+S1(config-if)#switchport access vlan 2
+</pre>
+      </div>
+      <p>
+       あらためて「show vlan」コマンドでVLANの設定を確認します。
+      </p>
+      <h4>
+       VLANの確認
+      </h4>
+      <div class="codehilite">
+       <pre><span></span>S1#show vlan
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Gi0/0, Gi0/1, Gi0/2
+2    VLAN0002                         active    Gi0/3, Gi1/0
+</pre>
+      </div>
+      <p>
+       グループごとにひとつのネットワークに属するようにする
+      </p>
+      <p>
+       第二章でお話したように1つのネットワークは必要以上に大きくすることが望ましくないため、
+適切なサイズに分離する必要があります。
+ただ、ネットワークの数だけ機器をそろえると金銭面、管理面のコストが大幅に増大してしまいます。
+      </p>
+      <p>
+       そのため、1つのネットワーク機器でいくつものネットワークを扱う様々な技術が利用され、
+その代表的なものがVLAN(L2)とVRF(L3)です。
+L3スイッチは実質的にVLANの仕様が必須ですので、まずはVLANの仕組みと使い方について説明をしましょう。
+      </p>
+      <h3 id="header-5">
+       VLAN内の通信の確認
+      </h3>
+      <p>
+       G0/1とG0/2がVLAN1に属し、G0/3とG1/0がVLAN2に属するという構成を作れました。
+PC同士に通信をさせて、VLAN1とVLAN2のネットワークが分離されていることを確認します。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>PC1#ping 10.0.1.102
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.0.1.102, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 5/5/6 ms
+</pre>
+      </div>
+      <p>
+       PC1とPC2は同じL2ネットワークであるVLAN1に属するため、pingが成功します。
+一方、PC1とPC3は異なるVLANであるため、pingが失敗します。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>PC1#ping 10.0.1.103
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.0.1.103, timeout is 2 seconds:
+.....
+Success rate is 0 percent (0/5)
+</pre>
+      </div>
+      <p>
+       PC3からPC2への通信もVLANが異なるためpingに失敗しますが、
+PC3からPC4へは同じVLANであるためpingが成功します。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>PC3#ping 10.0.1.102
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.0.1.102, timeout is 2 seconds:
+.....
+Success rate is 0 percent (0/5)
+PC3#ping 10.0.1.104
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.0.1.104, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 3/3/4 ms
+</pre>
+      </div>
+      <h3 id="header-6">
+       VLANとMACアドレステーブル
+      </h3>
+      <p>
+       二章で使った「show mac address-table」コマンドでMACテーブルを確認すると、
+MACアドレスとポートの情報だけでなく、VLAN番号も記載があることが分かります。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>S1#show mac address-table
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+   1    0000.0000.0101    DYNAMIC     Gi0/1
+   1    0000.0000.0102    DYNAMIC     Gi0/2
+   2    0000.0000.0103    DYNAMIC     Gi0/3
+   2    0000.0000.0104    DYNAMIC     Gi1/0
+Total Mac Addresses for this criterion: 4
+</pre>
+      </div>
+      <p>
+       VLAN1のポートから来たフレームの転送にはVLAN1のMACテーブルのみが利用されます。
+宛先アドレスがVLAN1のテーブル内に存在すれば、そのポートに転送されます。
+宛先アドレスがVLAN1のテーブル内になければ、VLAN1の全ポートにてユニキャストフラッディングが実施されます。
+VLAN2に宛先MACのエントリがたとえあったとしても、それは利用されません。
+      </p>
+      <h2 id="header-7">
+       アクセスポートとトランクポート
+      </h2>
+      <p>
+       大きなネットワークを作るためには複数のスイッチを階層構造を作って接続します。
+各スイッチに複数のVLANが設定されている場合、
+スイッチ間を接続するポートは一般的に「
+       <strong>
+        トランクポート
+       </strong>
+       」と呼ばれる「複数のVLANを使えるポート」の設定にします。
+今までのような各ポートがひとつのVLANしか使えない設定をすると、VLANの数だけスイッチ間を接続しなければならなくなるためです。
+      </p>
+      <p>
+       複数のVLANをスイッチ間の1つのリンクでやりとりするためには、
+スイッチ間を流れる各フレームがどのVLANかを識別できるようにする必要があります。
+これはフレームのイーサネットヘッダにVLAN番号を記載した「
+       <strong>
+        VLANタグ
+       </strong>
+       」という目印をつけることで実現しています。
+フレームを送信する側のスイッチは、送信する際にVLANに応じたタグをつけて送ります。
+受け取る側はそのタグを見ることで、どのVLANあての通信かを識別できます。
+      </p>
+      <p>
+       なお、「VLANタグをつけない」ということもひとつのVLANを識別するためのルールとして使えます。
+多くのVLANはタグありで利用されますが、ひとつのVLANだけはタグなしで送ることができ、
+そのVLANは「ネイティブVLAN」や「VLAN 0」と呼ばれます。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0025_image/01.png"/>
+      </p>
+      <p>
+       今まで利用してきた「1つのポートで1つのVLANしか使えない」ポートは「
+       <strong>
+        アクセスポート
+       </strong>
+       」と呼ばれています。
+ひとつのVLANしか利用しないため、フレームにはVLANを識別するためのタグは設定されていません。
+      </p>
+      <p>
+       一般的には「スイッチの間はトランクポートで接続する」「ホストとスイッチはアクセスポートで接続する」というルールがあります。
+ホストが仮想化サーバーなどであれば、ホストともトランク接続することが多いです。
+      </p>
+      <p>
+       以下のような構成を作成することでトランクの設定と動作について確認します。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0025_image/01.png"/>
+      </p>
+      <h3 id="header-8">
+       トランクポートの設定
+      </h3>
+      <p>
+       トランクポートを実現するタグのつけかたには複数種類ありますが、現在は「
+       <strong>
+        Dot1Q
+       </strong>
+       」と呼ばれるものが主流です。
+タグの付け方を指定するにはインターフェース設定モードで「switchport trunk encapsulation dot1q」コマンドを使います。
+      </p>
+      <p>
+       タグの付け方を指定すれば、インターフェースのモードを「switchport mode trunk」でトランクに変えられます。
+インターフェースのデフォルトのモードはアクセスで、トランクからアクセスに戻すには「switchport mode access」を入力します。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>S1(config-vlan)#int g0/3
+S1(config-if)#switchport trunk encapsulation dot1q
+S1(config-if)#switchport mode trunk
+</pre>
+      </div>
+      <p>
+       スイッチ2にも同様の設定を加えて、スイッチ3のポートもトランクに変更します。
+1つのポートずつトランクの設定をしても良いのですが、3つのポートに同じ設定をいれるため、
+「range」を使って複数のインターフェースを同時に指定してみます。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>S3(config)#int range g0/1-3
+S3(config-if-range)#switchport trunk encapsulation dot1q
+S3(config-if-range)#switchport mode trunk
+</pre>
+      </div>
+      <p>
+       スイッチのポートのVLAN関係の設定はリンクを結ぶ両スイッチで整合性を持って行う必要があります。
+片方のスイッチでVLANを作成し忘れていたりすると、そのVLANの通信はそのスイッチを通過できなくなります。
+アクセスポートとトランクポートを接続したり、
+VLAN番号の違うアクセスポート同士を接続するといったことは障害に繋がるため注意してください。
+      </p>
+      <p>
+       トランクポートを確認するには「show interface trunk」コマンドを使います。
+これを使うとトランクポートの一覧と、それぞれのポートがどのVLANを通しているのかが分かります。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>S3#show interfaces trunk
+
+Port        Mode             Encapsulation  Status        Native vlan
+Gi0/1       on               802.1q         trunking      1
+Gi0/2       on               802.1q         trunking      1
+Gi0/3       on               802.1q         trunking      1
+
+Port        Vlans allowed on trunk
+Gi0/1       1-4094
+Gi0/2       1-4094
+Gi0/3       1-4094
+
+Port        Vlans allowed and active in management domain
+Gi0/1       1-3
+Gi0/2       1-3
+Gi0/3       1-3
+
+Port        Vlans in spanning tree forwarding state and not pruned
+Gi0/1       1-3
+Gi0/2       1-3
+Gi0/3       none
+</pre>
+      </div>
+      <p>
+       この設定が完了したら、3台のスイッチをまたがってVLANが繋がります。
+同じVLANのPC同士でpingができることを確認してください。
+      </p>
+      <h3 id="header-9">
+       アラウドVLANの設定
+      </h3>
+      <p>
+       VLANの制御をする際に重要になるのが、どのVLANを通すかということです。
+適切に設定されておらずVLANが分断されてしまったり、
+不必要にスイッチ間でVLANを繋げすぎて無駄に大きいネットワークを作ることはよくありません。
+      </p>
+      <p>
+       VLANを扱ううえでまず知っておくべきことは、あるVLAN-Xがスイッチで作成されていないと、
+そのVLAN-Xのフレームは全て破棄するということです。
+例えば以下のような構成だと、下位のスイッチにはVLAN-2があるものの、
+それらを繋ぐ上位のスイッチにVLAN-2が存在しないため、フレームを届けることができません。
+      </p>
+      <p>
+       &lt;&lt;図&gt;&gt;
+      </p>
+      <p>
+       上位のスイッチでは下位のスイッチが使っている全てのVLANを作成しておくようにしてください。
+試しにSW3でVLANを消してみると、スイッチを跨ぐ通信が届かなくなることが確認できるはずです。
+なお、VLAN1は消せません。
+      </p>
+      <p>
+       フレームを届けられないほど大きな問題ではありませんが、
+不必要にフレームを届けすぎてしまうことも問題となります。
+例えば以下の図を見て下さい。
+      </p>
+      <p>
+       &lt;&lt;図&gt;&gt;
+      </p>
+      <p>
+       「アラウドVLAN(Allowed VLAN)」をトランクポートに設定することで、
+VLANの通信を届けすぎてしまうことを防げます。
+許可する(Allow)という名前から分かるように、
+アラウドVLANとして設定されたVLANのフレームだけをそのポートで送受信するようになります。
+デフォルトは全てのVLANを許可しています。
+      </p>
+      <p>
+       アラウドVLANの設定方法は複数あり、全てを列挙したり、これ以外と指定したり、今ある設定にこれを追加などとできます。
+細かい設定方法は本質にはそれほど重要ではないため、
+ここでは全てを列挙する「switchport trunk allowed vlan
+       <vlan番号群>
+        」を使います。
+       </vlan番号群>
+      </p>
+      <div class="codehilite">
+       <pre><span></span>S3(config)#int g0/1
+S3(config-if)#switchport trunk allowed vlan 1,2  
+</pre>
+      </div>
+      <p>
+       この設定をすると、g0/1のインターフェースではVLAN1,2しかやりとりしないようになります。
+それ以外の全てのVLAN宛のフレームが届いた場合は破棄しますし、
+そのポートからVLAN1,2以外のフレームを出さないようになります。
+      </p>
+      <p>
+       アラウドVLANの設定も「show interface trunk」で確認できます。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>S3#show int trunk
+
+Port        Mode             Encapsulation  Status        Native vlan
+Gi0/1       on               802.1q         trunking      1
+Gi0/2       on               802.1q         trunking      1
+Gi0/3       on               802.1q         trunking      1
+
+Port        Vlans allowed on trunk
+Gi0/1       1-2
+Gi0/2       1-4094
+Gi0/3       1-4094
+
+Port        Vlans allowed and active in management domain
+Gi0/1       1-2
+Gi0/2       1-3
+Gi0/3       1-3
+
+Port        Vlans in spanning tree forwarding state and not pruned
+Gi0/1       1-2
+Gi0/2       1-3
+Gi0/3       1-3
+</pre>
+      </div>
+      <h3 id="header-10">
+       ネイティブVLANの設定
+      </h3>
+      <p>
+       最後に次のセクションのためにSW3のルーターに接続するポートG0/3で、
+ネイティブVLANを変更します。
+デフォルトのネイティブVLANはVLAN1であるため、VLAN1のフレームにはタグがついていません。
+ただ、G0/3ではデフォルトVLANを全く利用しないVLAN99に割り当てます。
+こうすることで、VLAN1にもタグがつけられるようになります。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>switchport trunk native vlan 99
+</pre>
+      </div>
+      <p>
+       &lt;&lt;図&gt;&gt;
+      </p>
+      <p>
+       注意をして欲しいのはスイッチとスイッチを接続する場合は、
+ネイティブVLANを必ず揃える必要があるということです。
+たとえばスイッチAとスイッチBがつながっており、スイッチAのポートのネイティブVLANが10で、
+スイッチBのネイティブVLANが20だとします。
+このときスイッチAがVLAN10のフレームをスイッチBに転送すると、そのフレームはVLAN20に変化してしまいます。
+繋がるべき通信ができなかったり、繋がるべきでない箇所が繋がるため、必ず揃えて下さい。
+      </p>
+      <!-- GENERATED HTML END -->
+      <!-- GENERATED HTML END -->
+      <nav>
+       <ul class="pager">
+        <li id="previous-li">
+         <a href="./009.html" id="previous-a">
+          ← Previous
+         </a>
+        </li>
+        <li>
+         <a href="#">
+          Page Top
+         </a>
+        </li>
+        <li class="pager-next" id="next-li">
+         <a href="./011.html" id="next-a">
+          Next →
+         </a>
+        </li>
+       </ul>
+      </nav>
+     </div>
+     <!-- /.blog-main -->
+     <div class="col-sm-3 col-sm-offset-1 u1-sidebar">
+      <!-- SNS start -->
+      <div class="sidebar-module">
+       <ul class="social-buttons">
+        <li>
+         <!-- hatena -->
+         <a class="hatena-bookmark-button" data-hatena-bookmark-lang="ja" data-hatena-bookmark-layout="basic-label-counter" href="http://b.hatena.ne.jp/entry/" title="このエントリーをはてなブックマークに追加">
+          <img alt="このエントリーをはてなブックマークに追加" height="20" src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" style="border: none;" width="20"/>
+         </a>
+         <script async="async" charset="utf-8" src="https://b.st-hatena.com/js/bookmark_button.js" type="text/javascript">
+         </script>
+        </li>
+        <li>
+         <!-- FB -->
+         <div class="fb-like" data-action="like" data-layout="button_count" data-share="true" data-show-faces="false" data-size="small">
+         </div>
+         <div id="fb-root">
+         </div>
+         <script>
+          (function(d, s, id) {
+                    var js, fjs = d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) return;
+                    js = d.createElement(s);
+                    js.id = id;
+                    js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.9";
+                    fjs.parentNode.insertBefore(js, fjs);
+                  }(document, 'script', 'facebook-jssdk'));
+         </script>
+        </li>
+        <li>
+         <!-- twitter -->
+         <a class="twitter-share-button" href="https://twitter.com/share">
+          Tweet
+         </a>
+         <script>
+          ! function(d, s, id) {
+                    var js, fjs = d.getElementsByTagName(s)[0],
+                      p = /^http:/.test(d.location) ? 'http' : 'https';
+                    if (!d.getElementById(id)) {
+                      js = d.createElement(s);
+                      js.id = id;
+                      js.src = p + '://platform.twitter.com/widgets.js';
+                      fjs.parentNode.insertBefore(js, fjs);
+                    }
+                  }(document, 'script', 'twitter-wjs');
+         </script>
+        </li>
+        <li>
+         <!-- G+ -->
+         <!-- head 内か、body 終了タグの直前に次のタグを貼り付けてください。 -->
+         <script async="" defer="" src="https://apis.google.com/js/platform.js">
+          {
+                    lang: 'ja'
+                  }
+         </script>
+         <!-- 共有ボタン を表示したい位置に次のタグを貼り付けてください。 -->
+         <div class="g-plus" data-action="share" data-annotation="none" data-height="24">
+         </div>
+        </li>
+        <li>
+         <!-- IN/Share -->
+         <script src="//platform.linkedin.com/in.js" type="text/javascript">
+          lang: ja_JP
+         </script>
+         <script data-counter="right" type="IN/Share">
+         </script>
+        </li>
+       </ul>
+      </div>
+      <!-- SNS end -->
+      <div class="sidebar-module">
+       <p class="sidebar-heading">
+        Network Boot Camp
+       </p>
+       <ol class="list-unstyled">
+        <li>
+         <a href="./">
+          トップページ
+         </a>
+        </li>
+        <li>
+         <a href="./navi.html">
+          目次
+         </a>
+        </li>
+        <li>
+         <a href="./qa.html">
+          質問と回答
+         </a>
+        </li>
+        <li>
+         <a href="./books.html">
+          おすすめネットワーク書籍
+         </a>
+        </li>
+       </ol>
+      </div>
+      <div class="sidebar-module">
+       <p class="sidebar-heading">
+        ネットワークの基礎
+       </p>
+       <ol class="list-unstyled">
+        <li>
+         <a href="./001.html">
+          自宅ネットワークの仕組み
+         </a>
+        </li>
+        <li>
+         <a href="./002.html">
+          ネットワーク機器
+         </a>
+        </li>
+        <li>
+         <a href="./003.html">
+          ネットワークケーブル
+         </a>
+        </li>
+        <li>
+         <a href="./004.html">
+          Cisco機器の操作方法
+         </a>
+        </li>
+        <li>
+         <a href="./005.html">
+          同一ネットワーク内のL2転送の仕組み
+         </a>
+        </li>
+        <li>
+         <a href="./006.html">
+          異なるネットワーク間のL3転送の仕組み
+         </a>
+        </li>
+        <li>
+         <a href="./007.html">
+          ルーティングプロトコルによる経路学習
+         </a>
+        </li>
+        <li>
+         <a href="./008.html">
+          その他のルーティングの重要トピック
+         </a>
+        </li>
+        <li>
+         <a href="./009.html">
+          ホストが使うプロトコル
+         </a>
+        </li>
+        <li>
+         <a href="./010.html">
+          VLAN
+         </a>
+        </li>
+        <li>
+         <a href="./011.html">
+          L3スイッチとVLAN間ルーティング
+         </a>
+        </li>
+        <li>
+         <a href="./012.html">
+          リンクの冗長化
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          L2ネットワークの冗長化
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          L2ネットワークの冗長化
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          L3ネットワークの冗長化
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          ACLによるパケットのフィルタ
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          NAT
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          BGPによるAS間接続
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          TCP/IP入門
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          IPアドレスの設計
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          TCPによる輻輳制御
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          IPv6
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          ネットワークの監視
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          パケットのキャプチャ
+         </a>
+        </li>
+       </ol>
+      </div>
+      <!-- amazon -->
+      <div class="sidebar-module">
+       <script type="text/javascript">
+        amazon_ad_tag = "grit-22";
+              amazon_ad_width = "300";
+              amazon_ad_height = "250";
+              amazon_ad_link_target = "new";
+       </script>
+       <script src="http://ir-jp.amazon-adsystem.com/s/ads.js">
+       </script>
+      </div>
+      <!-- amazon end-->
+      <div class="sidebar-module">
+       <p class="sidebar-heading">
+        Python入門
+       </p>
+       <ol class="list-unstyled">
+        <li>
+         <a href="https://github.com/yuichi110/www.yuichi.com-python" target="_blank">
+          <span class="fa fa-github">
+          </span>
+          GitHub Repository
+         </a>
+        </li>
+        <li>
+         <a href="https://twitter.com/yuichi110" target="_blank">
+          <i class="fa fa-twitter">
+          </i>
+          Twitter
+         </a>
+        </li>
+        <li>
+         <a href="https://www.linkedin.com/in/yuichiito/" target="_blank">
+          <span class="fa fa-linkedin">
+          </span>
+          Linkedin (英語)
+         </a>
+        </li>
+        <li class="li-none">
+         <a href="#" id="rw_email_contact">
+          <span class="fa fa-envelope">
+           Mail
+          </span>
+         </a>
+         <script type="text/javascript">
+          var _rwObsfuscatedHref0 = "mai";
+                  var _rwObsfuscatedHref1 = "lto";
+                  var _rwObsfuscatedHref2 = ":yu";
+                  var _rwObsfuscatedHref3 = "ich";
+                  var _rwObsfuscatedHref4 = "i@y";
+                  var _rwObsfuscatedHref5 = "uic";
+                  var _rwObsfuscatedHref6 = "hi.";
+                  var _rwObsfuscatedHref7 = "com";
+                  var _rwObsfuscatedHref = _rwObsfuscatedHref0 + _rwObsfuscatedHref1 + _rwObsfuscatedHref2 + _rwObsfuscatedHref3 + _rwObsfuscatedHref4 + _rwObsfuscatedHref5 + _rwObsfuscatedHref6 + _rwObsfuscatedHref7;
+                  document.getElementById("rw_email_contact").href = _rwObsfuscatedHref;
+         </script>
+        </li>
+       </ol>
+      </div>
+      <div class="sidebar-module">
+       <!-- padding for side bar -->
+       <div class="hidden-xs">
+        <p style="height:500px">
+        </p>
+       </div>
+      </div>
+     </div>
+     <!-- /.blog-sidebar -->
+    </div>
+    <!-- /.row -->
+   </div>
+   <!-- /.container -->
+   <footer>
+    <div class="u1-footer-top">
+    </div>
+    <div class="u1-footer">
+     <p>
+      Copyright © 2017 Yuichi Ito All Rights Reserved.
+     </p>
+     <p align="center">
+      修正依頼がある場合は右ページよりページURLと問題箇所を指摘願います。
+      <a href="https://github.com/yuichi110/www.yuichi.com-python/issues">
+       <span class="fa fa-github">
+       </span>
+       Git Hub Issues
+      </a>
+     </p>
+    </div>
+   </footer>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js">
+   </script>
+   <script src="./assets/js/bootstrap.min.js">
+   </script>
+   <script src="./assets/js/delete_useless_dom.js">
+   </script>
+   <!-- GOOGLE ANALYTICS -->
+   <script>
+    (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+          (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+          m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+      })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+      ga('create', 'UA-4830860-7', 'auto');
+      ga('send', 'pageview');
+   </script>
+  </div>
+  <!-- end of background -->
+ </body>
+</html>

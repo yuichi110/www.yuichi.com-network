@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ja-JP">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta content="Sample Description" name="description"/>
+  <meta content="Yuichi Ito" name="author"/>
+  <title>
+   Network Boot Camp
+  </title>
+  <link href="/img/favicon.ico" rel="shortcut icon"/>
+  <!-- Bootstrap -->
+  <link href="./assets/css/bootstrap.css" rel="stylesheet">
+   <link href="./assets/css/bootstrap-theme.css" rel="stylesheet"/>
+   <link href="./assets/css/bootstrap_u1.css" rel="stylesheet"/>
+   <!-- Font -->
+   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"/>
+   <link href="https://fonts.googleapis.com/earlyaccess/mplus1p.css" rel="stylesheet">
+    <!-- Code Highlight -->
+    <link href="./assets/css/codehilite_colorful.css" rel="stylesheet"/>
+    <!-- Custom -->
+    <link href="./assets/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="./assets/icomoon/style.css" rel="stylesheet"/>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+   </link>
+  </link>
+ </head>
+ <body>
+  <div class="backgroundLayer">
+   <!-- Fixed navbar -->
+   <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+     <div class="navbar-header">
+      <button aria-controls="navbar" aria-expanded="false" class="navbar-toggle collapsed" data-target="#navbar" data-toggle="collapse" type="button">
+       <span class="sr-only">
+        Toggle navigation
+       </span>
+       <span class="icon-bar">
+       </span>
+       <span class="icon-bar">
+       </span>
+       <span class="icon-bar">
+       </span>
+      </button>
+      <a class="navbar-brand active" href="./">
+       Python
+      </a>
+     </div>
+     <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav">
+       <li class="">
+        <a href="./navi.html">
+         Navi
+        </a>
+       </li>
+       <li class="">
+        <a href="./qa.html">
+         QA
+        </a>
+       </li>
+       <li class="">
+        <a href="./books.html">
+         Books
+        </a>
+       </li>
+       <li style="font-family: avenger">
+        <a href="/">
+         GC
+        </a>
+       </li>
+      </ul>
+     </div>
+    </div>
+   </nav>
+   <div class="container">
+    <div class="u1-header">
+     <a href="./" style=" text-decoration: none;">
+      <div class="u1-title">
+       Network Boot Camp
+      </div>
+      <p class="lead u1-description">
+       ネットワーク構築の訓練プログラム
+      </p>
+     </a>
+    </div>
+    <div class="row">
+     <div class="col-sm-8 u1-main">
+      <!-- GENERATED HTML START -->
+      <!-- GENERATED HTML START -->
+      <h1>
+       ルーティングその他
+      </h1>
+      <h2>
+       経路選択アルゴリズム
+      </h2>
+      <p>
+       ルーティングテーブルにおいて「0.0.0.0/0」のデフォルトルートより、
+宛先「10.0.0.100」は「10.0.0.0/8」の経路が優先されます。
+このようにルーティングテーブルのエントリには優先度があり、
+複数の経路の選択肢がある場合は最も優先度が高いものが選ばれます。
+      </p>
+      <p>
+       経路選択の優先度は以下の順序で決まります。
+      </p>
+      <ol>
+       <li>
+        プレフィックス長の比較
+       </li>
+       <li>
+        AD値の比較
+       </li>
+       <li>
+        メトリックの比較
+       </li>
+      </ol>
+      <p>
+       プレフィックス長の比較で優先度が同じであれば、AD値の比較に移る。
+AD値の比較でも優先度が同じであればメトリックの比較をするという流れです。
+メトリックも同じであった場合にどうなるかはプロトコル及び設定次第ですが、
+一般的にはどれか一つのルートを使うか、ロードバランス(全て使う)するかのどちらかです。
+      </p>
+      <p>
+       それぞれの比較方式について説明します。
+      </p>
+      <h3>
+       プレフィックス長の比較
+      </h3>
+      <p>
+       経路選択においていちばん重要なルールは「経路がより詳細に指定されているエントリを優先する」というものです。
+具体的にはサブネットマスクの長さ(プレフィックス長)が長いものを、短いものより優先するということです。
+「10.1.0.0/16」のネットワークへのルーティングは「10.0.0.0/8」よりも「10.1.0.0/16」のエントリを優先します。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0010_image/01.png"/>
+      </p>
+      <p>
+       実際にスタティックルートとTracerouteを使って、この動きを確認します。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>ルーティングテーブルの表示
+</pre>
+      </div>
+      <div class="codehilite">
+       <pre><span></span>Tracerouteの表示
+</pre>
+      </div>
+      <h3>
+       AD値の比較
+      </h3>
+      <p>
+       経路学習には様々な手法やプロトコルがあります。
+たとえば管理者が手動で設定するスタティックルートや、OSPFによる自動学習などです。
+      </p>
+      <p>
+       これらの経路の学習元(ソース)には信頼性が設定されており、
+それは「
+       <strong>
+        AD値(Administrative Distance)
+       </strong>
+       」と呼ばれています。
+スタティックルートにもOSPFにもAD値が設定されており、
+同じ経路を複数のソースから学習していた際は、ソースのAD値を比較することでどのルートを使うかを決めます。
+AD値は「
+       <strong>
+        値が低いものが優先される
+       </strong>
+       」というルールがあります。
+      </p>
+      <p>
+       CiscoのルーターにおけるデフォルトのAD値は以下のようになっています。
+学んでいないプロトコルなどもあるので知らないものは無視してもらって構いませんが、
+今まで学んだものだと「直接接続されるネットワーク」「スタティックルート」「OSPF」という順で経路を選択することがわかります。
+なお、AD値の比較よりプレフィックス長の比較の優先度が高いため、
+より細かい経路を学習してしまうと直接接続しているネットワークあての通信だったとしても、
+パケットが他のネットワークに転送されてしまうといったことは発生します。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>接続済み    0
+スタティック  1
+eBGP    20
+EIGRP（内部）   90
+IGRP    100
+OSPF    110
+IS-IS   115
+RIP 120
+EIGRP（外部）   170
+iBGP    200
+EIGRP サマリー ルート  5
+</pre>
+      </div>
+      <p>
+       このデフォルトのAD値には「自動学習したものより自分で設定したものを優先する」といった常識的なルールが適用されています。
+EIGRPというCisco独自のルーティングプロトコルをOSPFより優先するといった点もありますが、
+組織内で複数のルーティングプロトコルを同時に動かすことは滅多にないため考慮は不要かと思います。
+ただ、BGPは他のルーティングプロトコルと共用されることがあるため、若干注意が必要です。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0010_image/01.png"/>
+      </p>
+      <div class="codehilite">
+       <pre><span></span>ルーティングテーブルの表示
+</pre>
+      </div>
+      <div class="codehilite">
+       <pre><span></span>Tracerouteの表示
+</pre>
+      </div>
+      <p>
+       なお、各ソースのAD値は変更することができます。
+スタティックルートは各エントリごとにAD値を調整することができるので、
+「ルーティングプロトコルにトラブルが起きて経路情報を失った際はここに転送する」といった使い方をまれにします。
+      </p>
+      <p>
+       AD値を意識しなければいけないようなネットワークを構築することは可能な限り避けて下さい。
+複数のソースで複雑なエントリを構築しているということは、理解しにくいネットワーク構造になっている可能性が高いです。
+      </p>
+      <h3>
+       メトリックの比較
+      </h3>
+      <p>
+       「
+       <strong>
+        メトリック
+       </strong>
+       」は各ルーティングプロトコルの経路選択のルールです。
+各ルーティングプロトコルごとに異なるメトリックのルールを持っているため、OSPFのメトリックはOSPFのなかだけで使われます。
+他のプロトコルとの比較はメトリックではなくAD値で行われます。
+      </p>
+      <p>
+       メトリックは特定のルーティングプロトコルで組織内で運用する際に重要な役割を果たします。
+複数のルーターが階層的に接続されている状況では、あるネットワークに辿り着く経路が複数ある場合があります。
+メトリックはそういった際に「この経路が良さそうだから、これを使う」といったことを判断する仕組みです。
+      </p>
+      <p>
+       たとえば以下の図では左側のネットワークから右側のネットワークまで辿り着く経路が上下にあります。
+プレフィックス長も同じで、AD値も共にOSPFなので同じです。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0010_image/01.png"/>
+      </p>
+      <p>
+       ただ、宛先までに辿り着くホップ数が異なっています。
+OSPFのメトリックの細かい計算方法は割愛しますが、
+「高帯域の経路を優先する」「もし同じ帯域ならホップ数が短いものを優先する」というルールを覚えておけば十分です。
+今回の場合は経路の帯域が全て同一ですので、ホップ数が短い上側の経路を選択します。
+もし上側の経路の帯域が下側より少ない(通常は1/10になる)場合は、下側のルートを選びます。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>ルーティングテーブルの表示
+</pre>
+      </div>
+      <div class="codehilite">
+       <pre><span></span>Tracerouteの表示
+</pre>
+      </div>
+      <p>
+       このように複数の経路で宛先にネットワークにいける場合は片側の経路が障害などで使えなくなったとしても、
+もう片側の経路を使うことができます。
+      </p>
+      <h2>
+       ルート再配送
+      </h2>
+      <p>
+       スタティックルートや複数のルーティングプロトコルを同時に使っている環境では、
+あるソースから学んだ経路を別のソースに対して伝播させることができます。
+この経路情報を異なるプロセスに伝播させることを「
+       <strong>
+        ルート再配送
+       </strong>
+       」と呼びます。
+ルート再配送はスタティックルートやEIGRPの経路情報をOSPFに流すといった使い方はもちろんですが、
+複数のOSPFのプロセス間(OSPFのグループ1、グループ2)で経路情報をやりとりするといった使い方もできます。
+      </p>
+      <p>
+       ルート再配送が使われるよくあるシナリオとしては、
+組織の中にもいくつかのネットワーク管理グループが分かれていて、
+そのグループ間で経路情報をやりとりしなければいけないといったものです。
+もしくは組織間で使われるBGPで学んだ経路情報を、組織内でOSPFなどとして伝播するといったものです。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0010_image/01.png"/>
+      </p>
+      <p>
+       なお、ルート再配送は積極的に利用するものではありません。
+使わずに済むのであれば、ネットワークの設計を変更するなどして綺麗な構成にすることを推奨します。
+たとえば後述する経路集約をすることを前提としてネットワークを設計すれば、
+組織内の細かいルートを再配送する必要はなくなり、おおまかなルートでグループ間の経路情報を定義できます。
+      </p>
+      <h3>
+       OSPFのルート再配送
+      </h3>
+      <h3>
+       サンプル
+      </h3>
+      <h2>
+       経路集約
+      </h2>
+      <p>
+       経路集約はネットワークの設計に関わる非常に重要な概念です。
+      </p>
+      <p>
+       経路集約は「連続した小さな複数のネットワーク」を「大きな一つのネットワーク」として外に見せるテクニックです。
+これを使うことでルーティングテーブルに記載されるエントリの数が減らせるので、ネットワークを管理しやすくなります。
+ただ、「連続した」とあるようにネットワークの設計をする際にレンジが近いネットワークアドレスを固める必要があります。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0010_image/01.png"/>
+      </p>
+      <p>
+       たとえば上記の図は複数の支店がある会社のネットワークの設計です。
+各支店のアドレスは「10.1.0.0/16」「10.2.0.0/16」「10.3.0.0/16」などと大まかに区切られており、
+支店の中でそのアドレスをやりくりしてネットワークを構築しています。
+      </p>
+      <p>
+       このような構成を取ると学習する経路情報は「支店間のルータは各支店の/16のネットワーク」
+「各支店内のルーターは各支店内の細かいルートで、10.0.0.0/8は支店間のルーターに全て任せる」とできます。
+このような構成を取るメリットはまず第一に分かりやすいものとなることがあげられます。
+また、全てのルーターが組織内の全ての経路情報の全てを学習する必要がなくなります。
+      </p>
+      <p>
+       ネットワークの障害は複雑な構成なネットワークで機器が故障したり設定変更をした際に発生することが多いので、
+シンプルな綺麗な構成を作れば「障害発生確率が減る」「障害発生のインパクトが減る」「復旧にかかる時間が短くなる」といいことずくめです。
+      </p>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0010_image/01.png"/>
+      </p>
+      <p>
+       経路集約を実現するテクニックは様々ありますが、よく使われるのは
+「全てを一つのルーティングプロトコルで実現する」
+「集約する境界で別のルーティングプロトコルのプロセスを使う」
+「集約されたルート間はスタティックルートで実現する」
+あたりです。
+昨今だと支店間をVPNで接続して、スタティックルートで本社と支店の間での経路情報を設定するというパターンが多いです。
+支店間の間のデータのやりとりは一旦本社を経由します。
+      </p>
+      <p>
+       ここではOSPFの経路集約機能を使って、全てをOSPFで実現するという手法を扱います。
+      </p>
+      <h3>
+       OSPFの経路集約
+      </h3>
+      <h3>
+       サンプル構成
+      </h3>
+      <h1>
+       コラム
+      </h1>
+      <p>
+       ルーターとスイッチのソフトウェアとハードウェア
+RIBとFIB
+転送用のASICとバックプレーン側のASIC
+      </p>
+      <p>
+       PCとルーターは同じネットワークに接続されているため、パケットをルーターに送るには第二章で説明した手順が使われます。
+復習がてらに説明すると以下の流れとなります。
+      </p>
+      <ol>
+       <li>
+        ARPでデフォルトゲートウェイのMACアドレスを問い合わせ(キャッシュされている場合は3へ)
+       </li>
+       <li>
+        デフォルトゲートウェイであるルーターがMACアドレスを通知
+       </li>
+       <li>
+        宛先MACアドレスをデフォルトゲートウェイのMACに設定し、パケットを転送
+       </li>
+       <li>
+        パケットを受け取ったルーターは宛先に応じてそのパケットをさらに転送
+       </li>
+      </ol>
+      <p>
+       ルーターから他のルーターに転送する場合も同様にARPを使って、
+次の宛先となるルータのMACアドレスを取得して同じネットワーク内の転送をします。
+ルーターから「パケットを届ける宛先の最終地点であるホスト」に転送する場合もARPとL2転送が使われます。
+      </p>
+      <p>
+       ルーターの転送の仕組みは追って話しますが、ネットワークA,B,Cという構成でネットワークAにいるホストから、
+ネットワークCにいるホストに通信をする場合は以下のようなパケットになります。
+      </p>
+      <!-- GENERATED HTML END -->
+      <!-- GENERATED HTML END -->
+      <nav>
+       <ul class="pager">
+        <li id="previous-li">
+         <a href="./007.html" id="previous-a">
+          ← Previous
+         </a>
+        </li>
+        <li>
+         <a href="#">
+          Page Top
+         </a>
+        </li>
+        <li class="pager-next" id="next-li">
+         <a href="./009.html" id="next-a">
+          Next →
+         </a>
+        </li>
+       </ul>
+      </nav>
+     </div>
+     <!-- /.blog-main -->
+     <div class="col-sm-3 col-sm-offset-1 u1-sidebar">
+      <!-- SNS start -->
+      <div class="sidebar-module">
+       <ul class="social-buttons">
+        <li>
+         <!-- hatena -->
+         <a class="hatena-bookmark-button" data-hatena-bookmark-lang="ja" data-hatena-bookmark-layout="basic-label-counter" href="http://b.hatena.ne.jp/entry/" title="このエントリーをはてなブックマークに追加">
+          <img alt="このエントリーをはてなブックマークに追加" height="20" src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" style="border: none;" width="20"/>
+         </a>
+         <script async="async" charset="utf-8" src="https://b.st-hatena.com/js/bookmark_button.js" type="text/javascript">
+         </script>
+        </li>
+        <li>
+         <!-- FB -->
+         <div class="fb-like" data-action="like" data-layout="button_count" data-share="true" data-show-faces="false" data-size="small">
+         </div>
+         <div id="fb-root">
+         </div>
+         <script>
+          (function(d, s, id) {
+                    var js, fjs = d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) return;
+                    js = d.createElement(s);
+                    js.id = id;
+                    js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.9";
+                    fjs.parentNode.insertBefore(js, fjs);
+                  }(document, 'script', 'facebook-jssdk'));
+         </script>
+        </li>
+        <li>
+         <!-- twitter -->
+         <a class="twitter-share-button" href="https://twitter.com/share">
+          Tweet
+         </a>
+         <script>
+          ! function(d, s, id) {
+                    var js, fjs = d.getElementsByTagName(s)[0],
+                      p = /^http:/.test(d.location) ? 'http' : 'https';
+                    if (!d.getElementById(id)) {
+                      js = d.createElement(s);
+                      js.id = id;
+                      js.src = p + '://platform.twitter.com/widgets.js';
+                      fjs.parentNode.insertBefore(js, fjs);
+                    }
+                  }(document, 'script', 'twitter-wjs');
+         </script>
+        </li>
+        <li>
+         <!-- G+ -->
+         <!-- head 内か、body 終了タグの直前に次のタグを貼り付けてください。 -->
+         <script async="" defer="" src="https://apis.google.com/js/platform.js">
+          {
+                    lang: 'ja'
+                  }
+         </script>
+         <!-- 共有ボタン を表示したい位置に次のタグを貼り付けてください。 -->
+         <div class="g-plus" data-action="share" data-annotation="none" data-height="24">
+         </div>
+        </li>
+        <li>
+         <!-- IN/Share -->
+         <script src="//platform.linkedin.com/in.js" type="text/javascript">
+          lang: ja_JP
+         </script>
+         <script data-counter="right" type="IN/Share">
+         </script>
+        </li>
+       </ul>
+      </div>
+      <!-- SNS end -->
+      <div class="sidebar-module">
+       <p class="sidebar-heading">
+        Network Boot Camp
+       </p>
+       <ol class="list-unstyled">
+        <li>
+         <a href="./">
+          トップページ
+         </a>
+        </li>
+        <li>
+         <a href="./navi.html">
+          目次
+         </a>
+        </li>
+        <li>
+         <a href="./qa.html">
+          質問と回答
+         </a>
+        </li>
+        <li>
+         <a href="./books.html">
+          おすすめネットワーク書籍
+         </a>
+        </li>
+       </ol>
+      </div>
+      <div class="sidebar-module">
+       <p class="sidebar-heading">
+        ネットワークの基礎
+       </p>
+       <ol class="list-unstyled">
+        <li>
+         <a href="./001.html">
+          自宅ネットワークの仕組み
+         </a>
+        </li>
+        <li>
+         <a href="./002.html">
+          ネットワーク機器
+         </a>
+        </li>
+        <li>
+         <a href="./003.html">
+          ネットワークケーブル
+         </a>
+        </li>
+        <li>
+         <a href="./004.html">
+          Cisco機器の操作方法
+         </a>
+        </li>
+        <li>
+         <a href="./005.html">
+          同一ネットワーク内のL2転送の仕組み
+         </a>
+        </li>
+        <li>
+         <a href="./006.html">
+          異なるネットワーク間のL3転送の仕組み
+         </a>
+        </li>
+        <li>
+         <a href="./007.html">
+          ルーティングプロトコルによる経路学習
+         </a>
+        </li>
+        <li>
+         <a href="./008.html">
+          その他のルーティングの重要トピック
+         </a>
+        </li>
+        <li>
+         <a href="./009.html">
+          ホストが使うプロトコル
+         </a>
+        </li>
+        <li>
+         <a href="./010.html">
+          VLAN
+         </a>
+        </li>
+        <li>
+         <a href="./011.html">
+          L3スイッチとVLAN間ルーティング
+         </a>
+        </li>
+        <li>
+         <a href="./012.html">
+          リンクの冗長化
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          L2ネットワークの冗長化
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          L2ネットワークの冗長化
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          L3ネットワークの冗長化
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          ACLによるパケットのフィルタ
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          NAT
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          BGPによるAS間接続
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          TCP/IP入門
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          IPアドレスの設計
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          TCPによる輻輳制御
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          IPv6
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          ネットワークの監視
+         </a>
+        </li>
+        <li>
+         <a href="./013.html">
+          パケットのキャプチャ
+         </a>
+        </li>
+       </ol>
+      </div>
+      <!-- amazon -->
+      <div class="sidebar-module">
+       <script type="text/javascript">
+        amazon_ad_tag = "grit-22";
+              amazon_ad_width = "300";
+              amazon_ad_height = "250";
+              amazon_ad_link_target = "new";
+       </script>
+       <script src="http://ir-jp.amazon-adsystem.com/s/ads.js">
+       </script>
+      </div>
+      <!-- amazon end-->
+      <div class="sidebar-module">
+       <p class="sidebar-heading">
+        Python入門
+       </p>
+       <ol class="list-unstyled">
+        <li>
+         <a href="https://github.com/yuichi110/www.yuichi.com-python" target="_blank">
+          <span class="fa fa-github">
+          </span>
+          GitHub Repository
+         </a>
+        </li>
+        <li>
+         <a href="https://twitter.com/yuichi110" target="_blank">
+          <i class="fa fa-twitter">
+          </i>
+          Twitter
+         </a>
+        </li>
+        <li>
+         <a href="https://www.linkedin.com/in/yuichiito/" target="_blank">
+          <span class="fa fa-linkedin">
+          </span>
+          Linkedin (英語)
+         </a>
+        </li>
+        <li class="li-none">
+         <a href="#" id="rw_email_contact">
+          <span class="fa fa-envelope">
+           Mail
+          </span>
+         </a>
+         <script type="text/javascript">
+          var _rwObsfuscatedHref0 = "mai";
+                  var _rwObsfuscatedHref1 = "lto";
+                  var _rwObsfuscatedHref2 = ":yu";
+                  var _rwObsfuscatedHref3 = "ich";
+                  var _rwObsfuscatedHref4 = "i@y";
+                  var _rwObsfuscatedHref5 = "uic";
+                  var _rwObsfuscatedHref6 = "hi.";
+                  var _rwObsfuscatedHref7 = "com";
+                  var _rwObsfuscatedHref = _rwObsfuscatedHref0 + _rwObsfuscatedHref1 + _rwObsfuscatedHref2 + _rwObsfuscatedHref3 + _rwObsfuscatedHref4 + _rwObsfuscatedHref5 + _rwObsfuscatedHref6 + _rwObsfuscatedHref7;
+                  document.getElementById("rw_email_contact").href = _rwObsfuscatedHref;
+         </script>
+        </li>
+       </ol>
+      </div>
+      <div class="sidebar-module">
+       <!-- padding for side bar -->
+       <div class="hidden-xs">
+        <p style="height:500px">
+        </p>
+       </div>
+      </div>
+     </div>
+     <!-- /.blog-sidebar -->
+    </div>
+    <!-- /.row -->
+   </div>
+   <!-- /.container -->
+   <footer>
+    <div class="u1-footer-top">
+    </div>
+    <div class="u1-footer">
+     <p>
+      Copyright © 2017 Yuichi Ito All Rights Reserved.
+     </p>
+     <p align="center">
+      修正依頼がある場合は右ページよりページURLと問題箇所を指摘願います。
+      <a href="https://github.com/yuichi110/www.yuichi.com-python/issues">
+       <span class="fa fa-github">
+       </span>
+       Git Hub Issues
+      </a>
+     </p>
+    </div>
+   </footer>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js">
+   </script>
+   <script src="./assets/js/bootstrap.min.js">
+   </script>
+   <script src="./assets/js/delete_useless_dom.js">
+   </script>
+   <!-- GOOGLE ANALYTICS -->
+   <script>
+    (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+          (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+          m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+      })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+      ga('create', 'UA-4830860-7', 'auto');
+      ga('send', 'pageview');
+   </script>
+  </div>
+  <!-- end of background -->
+ </body>
+</html>

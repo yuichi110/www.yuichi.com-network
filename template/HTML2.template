@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand {{ NAV_HOME }}" href="./">Python</a>
+          <a class="navbar-brand {{ NAV_HOME }}" href="./">Network</a>
         </div>
 
         <div id="navbar" class="navbar-collapse collapse">
@@ -71,7 +71,7 @@
             Network Boot Camp
           </div>
           <p class="lead u1-description">
-            ネットワーク構築の訓練プログラム
+            作りながら学ぶネットワーク入門
           </p>
         </a>
       </div>
@@ -174,11 +174,16 @@
               </li>
             </ul>
           </div>
-
+          <div class="print">
+            <a href="./003_print.html">
+       <img src="./assets/images/print.png"/>
+       印刷する
+      </a>
+          </div>
           <!-- SNS end -->
           <div class="sidebar-module">
             <p class='sidebar-heading'>
-              Network Boot Camp
+              Python入門
             </p>
             <ol class="list-unstyled">
               <li>
@@ -198,142 +203,33 @@
               </li>
               <li>
                 <a href="./books.html">
-         おすすめネットワーク書籍
+         おすすめNetwork書籍
         </a>
               </li>
             </ol>
           </div>
-
           <div class="sidebar-module">
             <p class='sidebar-heading'>
-              ネットワークの基礎
+              コンテンツ
             </p>
             <ol class="list-unstyled">
               <li>
                 <a href="./001.html">
-         自宅ネットワークの仕組み
+         自宅のネットワーク
         </a>
               </li>
               <li>
                 <a href="./002.html">
-         ネットワーク機器
+         スイッチング(L2転送)
         </a>
               </li>
               <li>
                 <a href="./003.html">
-         ネットワークケーブル
+         ルーティング(L3転送)
         </a>
               </li>
-              <li>
-                <a href="./004.html">
-         Cisco機器の操作方法
-        </a>
-              </li>
-              <li>
-                <a href="./005.html">
-         同一ネットワーク内のL2転送の仕組み
-        </a>
-              </li>
-              <li>
-                <a href="./006.html">
-         異なるネットワーク間のL3転送の仕組み
-        </a>
-              </li>
-              <li>
-                <a href="./007.html">
-         ルーティングプロトコルによる経路学習
-        </a>
-              </li>
-              <li>
-                <a href="./008.html">
-         その他のルーティングの重要トピック
-        </a>
-              </li>
-              <li>
-                <a href="./009.html">
-         ホストが使うプロトコル
-        </a>
-              </li>
-              <li>
-                <a href="./010.html">
-         VLAN
-        </a>
-              </li>
-              <li>
-                <a href="./011.html">
-         L3スイッチとVLAN間ルーティング
-        </a>
-              </li>
-              <li>
-                <a href="./012.html">
-         リンクの冗長化
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         L2ネットワークの冗長化
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         L2ネットワークの冗長化
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         L3ネットワークの冗長化
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         ACLによるパケットのフィルタ
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         NAT
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         BGPによるAS間接続
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         TCP/IP入門
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         IPアドレスの設計
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         TCPによる輻輳制御
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         IPv6
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         ネットワークの監視
-        </a>
-              </li>
-              <li>
-                <a href="./013.html">
-         パケットのキャプチャ
-        </a>
-              </li>
-
             </ol>
           </div>
-
-
           <!-- amazon -->
           <div class="sidebar-module">
             <script type="text/javascript">
