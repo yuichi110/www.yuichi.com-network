@@ -143,6 +143,8 @@ Router#
 本番環境で使っている機器では誰でも管理者として機器を操作できる状態はセキュリティ上望ましくありません。
 必ずパスワードを設定してください。
 
+![image](./0020_image/04.png)
+
 
 ### 特権モードからユーザーモードへの移行
 
@@ -156,9 +158,6 @@ Router>
 
 特権モードから「exit」コマンドを使うと、
 ユーザーモードを経由せずにログアウトします。
-ユーザーモードでのログアウトと同じくコンソールログインしていた場合はログイン画面に戻り、
-SSHなどでリモートからログインしていればセッションが切れます。
-
 
 ### 管理者モードから設定モード
 
@@ -220,6 +219,8 @@ R1(config-router)#
 ```
 
 これらのモードやコマンドの意味については後ほど扱います。
+
+![image](./0020_image/05.png)
 
 
 ### 設定モードから管理者モードへの戻り方
@@ -305,34 +306,60 @@ R1#
 ```
 
 showコマンドの一部は管理者モードでは使えるが、ユーザーモードでは使えないようになっています。
+たとえば「show running-config」という機器の設定を全て確認するコマンドは管理者モードでしか使えません。
 
+```text
+R2>show running-config
+         ^
+% Invalid input detected at '^' marker.
 
+R2>
+R2>en
+R2#show running-config
+Building configuration...
+
+Current configuration : 4801 bytes
+!
+! Last configuration change at 23:23:10 UTC Wed Apr 11 2018
+!
+version 15.6
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+...
+```
 
 
 ### doコマンド
 
-設定モードでは基本的に使えませんが、後述する「do」コマンドを使うことで不便ながら利用することはできます。
-
-設定モードに入るとshowコマンドで状態確認ができなくなります。
-
-```text
-サンプル
-```
-
-doコマンドに続けてshowコマンドを続けることで、この制約が解除できます。
+設定モードは設定変更をするためのモードであるため、
+showコマンドを使うことができません。
 
 ```text
-サンプル
+R2(config)#show clock
+             ^
+% Invalid input detected at '^' marker.
+
+R2(config)#
 ```
 
-ただ、doコマンドを使っているとコマンドの補完ができません。
-コマンドを完全に覚えていない場合は管理者モードに戻ってshowコマンドを実施してください。
+ただし、「**do**」コマンドに続けてshowコマンドを続けることで、
+設定モードであってもshowコマンドを利用できます。
 
+```text
+R2(config)#do show clock
+*00:01:52.018 UTC Thu Apr 12 2018
+R2(config)#
+```
+
+doコマンドを使うとタブや?が使えないため、
+コマンドを完全に暗記している場合にしか利用できません。
+設定を加えている最中に現在の設定を確認したりすることが多いです。
 
 ### インターフェースの一覧確認
 
 showコマンドにも体系がありますが、とりあえず使うことを優先して細かな説明は省きます。
-「show ip interface brief」コマンドでルーターのインターフェースの一覧を得ます。
+「**show ip interface brief**」コマンドでルーターのインターフェースの一覧を得ます。
 
 ```text
 Router#show ip interface brief
@@ -341,63 +368,91 @@ GigabitEthernet0/0         unassigned      YES unset  administratively down down
 GigabitEthernet0/1         unassigned      YES unset  administratively down down    
 ```
 
-インターフェースが2つあり、IPアドレスは設定されておらず、
-状態が「administratively down(明示的にdownさせている)」となっています。
-VIRLではG0/0のインターフェースは機器の管理用に作成されているため、
-トポロジには表示されていません。
-
-「configure terminal」で設定モードに入るとshowコマンドで状態確認ができなくなります。
+この例ではインターフェース「GigabitEthernet0/0」と「GigabitEthernet0/1」があり、
+それぞれのIPアドレスは設定されていません。
+インターフェースの状態が「administratively down(明示的にdownさせている)」となっています。
 
 ### インターフェースの状態確認
 
-show int XXXXX
+個別のインターフェースを確認するには「**show interface <インターフェース名>**」コマンドを使います。
+
+```text
+R2#show interfaces gigabitEthernet 0/1
+GigabitEthernet0/1 is administratively down, line protocol is down
+  Hardware is iGbE, address is fa16.3e49.367e (bia fa16.3e49.367e)
+  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec,
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Auto Duplex, Auto Speed, link type is auto, media type is RJ45
+  output flow-control is unsupported, input flow-control is unsupported
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input never, output never, output hang never
+  Last clearing of "show interface" counters never
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+  5 minute input rate 0 bits/sec, 0 packets/sec
+  5 minute output rate 0 bits/sec, 0 packets/sec
+     0 packets input, 0 bytes, 0 no buffer
+     Received 0 broadcasts (0 IP multicasts)
+     0 runts, 0 giants, 0 throttles
+     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored
+     0 watchdog, 0 multicast, 0 pause input
+     0 packets output, 0 bytes, 0 underruns
+     0 output errors, 0 collisions, 1 interface resets
+     0 unknown protocol drops
+     0 babbles, 0 late collision, 0 deferred
+     0 lost carrier, 0 no carrier, 0 pause output
+     0 output buffer failures, 0 output buffers swapped out
+R2#
+```
+
+このコマンドはインターフェースの詳細な状況を確認できます。
+アップしているか否か、IPアドレス、MACアドレス。
+それに加えてどの程度パケットを送受信しているかといったこともわかります。
 
 
 
 ## 機器の設定
 
-管理者モードで「configure terminal」で
-設定モードで設定を加えて、もういちど確認をしたい場合は管理者モードに戻って操作をします。
+機器を利用するには設定を正しくおこなうことが必要です。
+使う機能により設定が異なるため全てカバーすることはできませんが、
+機器名やインターフェースにIPを設定するといった基本的な内容をここで扱います。
 
-### グローバルコンフィグ
+### ホスト名(グローバル設定モード)
+
+グローバル設定モードでは特定の機能に依存しない一般的な設定をします。
+たとえばホスト名の設定などです。
 
 ホスト名の変更は「**hostname <ホスト名>**」というコマンドを使います。
 全ての機器の名前が同じだと区別がしにくいため、図と同じ名前であるPC1を設定します。
-プロンプトに表示されていたホスト名が変更されました。
 
 ```text
 Router(config)#hostname PC1
 PC1(config)#
 ```
 
-### 設定モード間の移行
+プロンプトに表示されていたホスト名が変更されました。
 
-次にこのルーターのインターフェースにIPアドレスを与えます。
-「**interface <設定したいインターフェース名>**」とすることで、
-設定モードから「インターフェース設定モード」に移ります。
+### IPアドレス(インターフェース設定モード)
+
+ルーターのインターフェースに設定されるIPは、機器全般の一般的な設定というよりは、
+そのインターフェースの設定です。
+このようなインターフェースやプロトコルといった何かに属する設定は、
+それの設定モードで実施します。
+
+インターフェースに設定を加えるのであれば、
+「**interface <設定したいインターフェース名>**」としてグローバル設定モードからインターフェース設定モードに移ります。
 
 ```text
 R1(config)#interface GigabitEthernet0/1
 R1(config-if)#
 ```
 
-設定が完了したので、設定モードから管理者モードに戻ります。
-「**exit**」コマンドで設定モードから1階層戻るという動きをし、
-「**end**」コマンドで一気に管理者モードまで戻るという動作をします。
-
-```text
-R1(config-if)#exit
-R1(config)#end
-R1#
-*Oct 25 00:15:17.728: %SYS-5-CONFIG_I: Configured from console by console
-```
-
-### インターフェース設定モード
-
-そして「**ip address <IPアドレス> <サブネットマスク>**」とすることで、
-ルーターのインターフェースにIPをふることができます。
-こちらも図の通りに設定しています。
-インターフェースが「admin shut」ですので「**no shutdown**」でインターフェースをアップさせます。
+図にあるように「10.0.0.1/8」という設定を加えます。
+IPを設定するにはインターフェース設定モードで「**ip address <IPアドレス> <サブネットマスク>**」とします。
+そしてダウンさせている設定を「**no shutdown**」とすることでアップさせる設定にします。
 
 ```text
 R1(config)#interface GigabitEthernet0/1
@@ -414,8 +469,7 @@ R1#
 ルーターからインターフェースがアップしたという旨のメッセージが得られました。
 
 再度、インターフェースの状態を「show ip interface brief」コマンドで確認します。
-各コマンドで使われる単語は他に被る単語がない状態であれば、省略可能です。
-そのため「show ip int bri」と入力すれば「show ip interface brief」として動きます。
+そうすると、インターフェースにIPが振られていることが確認できました。
 
 ```text
 R1#show ip int bri
@@ -428,6 +482,8 @@ GigabitEthernet0/1         10.0.1.101      YES manual up                    up
 最後に「write」コマンドで設定をルーターに保存します。
 様々なコマンドを打つことで設定はルーターやスイッチに適用されていきますが、
 設定を保存しないと再起動をした際に更新した設定が全て消えています。
+
+
 
 ## 設定の確認と保存
 
