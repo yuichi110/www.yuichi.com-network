@@ -450,6 +450,8 @@ R1(config)#interface GigabitEthernet0/1
 R1(config-if)#
 ```
 
+![image](./0020_image/06.png)
+
 図にあるように「10.0.0.1/8」という設定を加えます。
 IPを設定するにはインターフェース設定モードで「**ip address <IPアドレス> <サブネットマスク>**」とします。
 そしてダウンさせている設定を「**no shutdown**」とすることでアップさせる設定にします。
@@ -487,7 +489,66 @@ GigabitEthernet0/1         10.0.1.101      YES manual up                    up
 
 ## 設定の確認と保存
 
-Ciscoのルーターやスイッチは「**startupコンフィグ**」と「**runningコンフィグ**」を持っています。
+Ciscoのルーターやスイッチに加えた設定は、保存をしないと電源オフや再起動で消えてしまいます。
+正しく設定を保存したり変更するには、どのように設定が扱われているかをきちんと理解する必要があります。
+
+設定ファイルには「**startup-config**」と「**running-config**」の2つがあります。
+その名前から分かるようにstartup-configは起動時に利用される設定情報で、
+running-configは現在起動しているその機器の設定となります。
+
+![image](./0020_image/07.png)
+
+Ciscoの機器は起動時にstartup-configに書かれている内容をrunning-configにコピーして、
+「running-config」の設定に書かれているように動作をするようになります。
+
+running-configの確認は「**show running-config**」コマンドでおこなえます。
+このコマンドは全ての設定を画面に出力しますが、
+特定の設定だけが必要な場合は「show running-config」に項目を続けます。
+例えば先ほど設定したインターフェースだけの設定を確認することもできます。
+
+```text
+R1#show running-config interface g0/1
+Building configuration...
+
+Current configuration : 109 bytes
+!
+interface GigabitEthernet0/1
+ ip address 10.0.0.1 255.0.0.0
+ duplex auto
+ speed auto
+ media-type rj45
+end
+```
+
+自分が設定していないspeedなどの設定も入っていますが、初期値だと思って下さい。
+逆に「no shutdown」などの設定も入っていませんが、それがデフォルト値で省略されているためです。
+
+たとえばインターフェースのIPを変更すると、
+このrunning-configの値も変わります。
+
+```text
+R1(config)#int g0/1
+R1(config-if)#ip add 10.0.0.100 255.0.0.0
+R1(config-if)#end
+R1#show run int g0/1
+Building configuration...
+
+Current configuration : 111 bytes
+!
+interface GigabitEthernet0/1
+ ip address 10.0.0.100 255.0.0.0
+ duplex auto
+ speed auto
+ media-type rj45
+end
+
+R1#
+```
+
+このrunning-configの設定は保存をしないと機器を停止したり再起動するとなくなってしまいます。
+「**write**」コマンドを使うことでrunning-configの内容を、
+起動時に読み込む設定ファイルであるstartup-configにコピーすることができます。
+
 
 ```text
 R1#write
@@ -498,10 +559,9 @@ R1#
 *Oct 25 00:16:41.831: %GRUB-5-CONFIG_WRITTEN: GRUB configuration was written to disk successfully.
 ```
 
-以上でルーターをPC1として使う設定が完了しました。
-名前とIPを変えた同じ設定をPC2とPC3にも加えて下さい。
+停止した際にrunning-configの内容を失っても、
+startup-configに同じ内容があるため再起動時にrunning-configにコピーされて同じ状態に戻ります。
 
-最後にスイッチの設定を変更します。
 
 ## 通信テストをするコマンド
 
@@ -519,25 +579,90 @@ Success rate is 80 percent (4/5), round-trip min/avg/max = 4/4/5 ms
 
 
 
-## 小ネタ
+## 便利なコマンド
 
-### 名前解決を防ぐ
+### 間違えたコマンド入力時に名前解決を防ぐ
+
+Ciscoの機器は誤ったコマンドを入力した際に名前解決しようとする場合があります。
+
+たとえば存在しないコマンド「hello」を入力すると以下のように名前解決をしようとして、
+それに10秒以上は時間を取られます。
 
 ```text
-no ip domain-lookup
+R1#hello
+Translating "hello"...domain server (255.255.255.255)
+ (255.255.255.255)
+Translating "hello"...domain server (255.255.255.255)
+
+% Bad IP address or host name
+% Unknown command or computer name, or unable to find computer address
+R1#
+```
+
+この名前解決を避けるには「**no ip domain-lookup**」コマンドを設定します。
+このコマンドを設定してから「hello」とすると、1秒ほどでレスポンスが戻ってきます。
+
+```text
+R1(config)#no ip domain-lookup
+R1(config)#end
+R1#hello
+Translating "hello"
+
+Translating "hello"
+
+% Bad IP address or host name
+% Unknown command or computer name, or unable to find computer address
 ```
 
 ### 出力割り込み時に再表示
 
-```text
-line con 0
-logging synchronous
-line vty 0 15
-logging synchronous
-```
+機器を操作している最中にリンクアップやダウンなどが発生すると、
+そのイベント出力文字と現在のコマンド入力が混ざって操作しにくくなります。
 
-### 出力を中断しない
+これを防ぐためにコンソール及びリモート接続で「**logging synchronous**」と設定すれば、
+機器からの割り込みの出力が発生したとしても次の行に入力中のコマンドが再表示されます。
 
 ```text
-terminal length 0
+R1(config)#line console 0
+R1(config-line)#logging synchronous
+R1(config)#line vty 0 15
+R1(config-line)#logging synchronous
 ```
+
+上記は「line console 0」がコンソール接続の設定モードとなり、
+「line vty 0 15」がリモート接続の設定モードとなります。
+
+
+### 長い出力をまとめて表示
+
+「show running-config」の出力は非常に多くなるため、途中で出力が止まって「--More--」と表示されます。
+これはLinuxのmoreコマンド(lessコマンドとほぼ同じ)と同じく、
+エンターボタンで1行進み、スペースボタンで複数行進みます。
+出力を抜けるにはQuitの「q」を入力します。
+
+```text
+R1#show running-config
+Building configuration...
+
+Current configuration : 4823 bytes
+!
+! Last configuration change at 00:33:01 UTC Fri Apr 13 2018
+!
+version 15.6
+service timestamps debug datetime msec
+<省略>
+!
+!
+mmi polling-interval 60
+ --More--
+```
+
+何行出力されるかという設定は「**terminal length**」コマンドで決まります。
+0とすれば全て出力という意味になるため、出力を中断されたくない場合は「terminal length 0」と設定します。
+
+```text
+R1#terminal length 0
+```
+
+ただ、このコマンドは機器に対して永続的な設定となるわけではなく、再起動すれば消えてしまいます。
+セッションごとに設定が必要です。
