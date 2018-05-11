@@ -201,42 +201,10 @@ Gi0/1        1     0               10.0.1.1/24        1     DR    0/0
 
 ### OSPFによる経路学習
 
+OSPFで学習した経路もルーティングテーブルのエントリに記載されます。
+「show ip route」コマンドを使うと、OSPFで学んだ経路は「O」というコードとともに表示されています。
+
 ```text
-R1#show ip route
-Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
-       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
-       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
-       E1 - OSPF external type 1, E2 - OSPF external type 2
-       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
-       ia - IS-IS inter area, * - candidate default, U - per-user static route
-       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
-       a - application route
-       + - replicated route, % - next hop override, p - overrides from PfR
-
-Gateway of last resort is not set
-
-      10.0.0.0/8 is variably subnetted, 5 subnets, 2 masks
-C        10.0.1.0/24 is directly connected, GigabitEthernet0/1
-L        10.0.1.1/32 is directly connected, GigabitEthernet0/1
-O        10.0.2.0/24 [110/2] via 10.0.99.2, 00:00:23, GigabitEthernet0/2
-C        10.0.99.0/24 is directly connected, GigabitEthernet0/2
-L        10.0.99.1/32 is directly connected, GigabitEthernet0/2
-```
-
-
-```
-R3(config-if)#int g0/1
-R3(config-if)#ip ospf 1 area 0
-R3(config-if)#int g0/2
-R3(config-if)#ip ospf 1 area 0
-R3(config-if)#int g0/3
-R3(config-if)#ip ospf 1 area 0
-R3(config-if)#
-*Oct 29 01:08:37.725: %OSPF-5-ADJCHG: Process 1, Nbr 10.0.99.1 on GigabitEthernet0/3 from LOADING to FULL, Loading Done
-*Oct 29 01:08:37.725: %OSPF-5-ADJCHG: Process 1, Nbr 10.0.99.2 on GigabitEthernet0/3 from LOADING to FULL, Loading Done
-```
-
-```
 R1#show ip route
 Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
        D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
@@ -258,7 +226,11 @@ O        10.0.3.0/24 [110/2] via 10.0.99.3, 00:00:37, GigabitEthernet0/2
 O        10.0.4.0/24 [110/2] via 10.0.99.3, 00:00:37, GigabitEthernet0/2
 C        10.0.99.0/24 is directly connected, GigabitEthernet0/2
 L        10.0.99.1/32 is directly connected, GigabitEthernet0/2
+```
 
+OSPFで学んだ経路情報のみを表示するには「show ip route ospf」コマンドを使います。
+
+```text
 R1#show ip route ospf
 Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
        D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
