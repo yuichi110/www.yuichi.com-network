@@ -1,8 +1,3 @@
-リアルなイラスト
- - Switch + SFP + Fiber
- - Switch + USBシリアル + シリアルケーブル
- - Switchの正面(Console, Management, Data)
-
 ホームネットワーク
 - バッファローのルーター
 - バッファローのスイッチ
@@ -12,7 +7,7 @@
 - プリンタ
 - QNAP NAS
 - ONU (NTT マーク)
-- IP電話
+- IP電話(黒電話っぽいアイコン)
 
 ネットワーク
 - インターネット　アイコン
@@ -22,10 +17,10 @@
 
 企業アイコン
 - Yahoo
-- Yahooトップページ
+- ブラウザのYahooトップページ
 - Google
-- Googleトップページ
-- Microsoft(Windows)
+- ブラウザのGoogleトップページ
+- Microsoft(Windowsのアイコン)
 - Apple
 
 ネットワーク機器
@@ -42,7 +37,7 @@
 
 ケーブル類
 - RJ45
-- Fiber
+- 光Fiber
 - SFP
 - Twinax
 - Wifiの電波
