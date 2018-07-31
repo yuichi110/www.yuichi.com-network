@@ -144,12 +144,12 @@
           </li>
           <li>
            <a href="#header-9">
-            特権モードから一般ユーザーモードへの移行
+            特権モードからユーザーモードへの移行
            </a>
           </li>
           <li>
            <a href="#header-10">
-            管理者モードから設定モード
+            特権モードから設定モードへの移行
            </a>
           </li>
           <li>
@@ -166,14 +166,14 @@
         </li>
         <li>
          <a href="#header-13">
+          コマンドの補完と省略
+         </a>
+        </li>
+        <li>
+         <a href="header-14">
           showコマンドでの状態確認
          </a>
          <ul>
-          <li>
-           <a href="#header-14">
-            コマンドの補完と省略
-           </a>
-          </li>
           <li>
            <a href="#header-15">
             doコマンド
@@ -198,61 +198,56 @@
          <ul>
           <li>
            <a href="#header-19">
-            グローバルコンフィグ
+            ホスト名(グローバル設定モード)
            </a>
           </li>
           <li>
            <a href="#header-20">
-            設定モード間の移行
-           </a>
-          </li>
-          <li>
-           <a href="#header-21">
-            インターフェース設定モード
+            IPアドレス(インターフェース設定モード)
            </a>
           </li>
          </ul>
         </li>
         <li>
-         <a href="#header-22">
+         <a href="#header-21">
           設定の確認と保存
          </a>
         </li>
         <li>
-         <a href="header-23">
+         <a href="header-22">
           通信テストをするコマンド
          </a>
          <ul>
           <li>
-           <a href="#header-24">
+           <a href="#header-23">
             ping
            </a>
           </li>
           <li>
-           <a href="#header-25">
+           <a href="#header-24">
             traceroute
            </a>
           </li>
          </ul>
         </li>
         <li>
-         <a href="#header-26">
-          小ネタ
+         <a href="#header-25">
+          便利なコマンド
          </a>
          <ul>
           <li>
-           <a href="#header-27">
-            名前解決を防ぐ
+           <a href="#header-26">
+            間違えたコマンド入力時に名前解決を防ぐ
            </a>
           </li>
           <li>
-           <a href="#header-28">
+           <a href="#header-27">
             出力割り込み時に再表示
            </a>
           </li>
           <li>
-           <a href="#header-29">
-            出力を中断しない
+           <a href="#header-28">
+            長い出力をまとめて表示
            </a>
           </li>
          </ul>
@@ -262,9 +257,6 @@
       <h2 id="header-1">
        概要
       </h2>
-      <p>
-       CDP, LLDP
-      </p>
       <h2 id="header-2">
        操作方法
       </h2>
@@ -290,11 +282,18 @@ Ciscoのルーターやスイッチも同様で、この両者に違いはあり
        ログイン方法として「コンソールに直結したログイン」と
 「SSHやTelnetを使ったリモートからのログイン」の2種類があります。
       </p>
+      <h4>
+       図: 機器へのログイン方法
+      </h4>
       <p class="blog-img">
        <img alt="image" class="img-responsive" src="./0020_image/01.png"/>
       </p>
       <p>
-       シスコの機器は「コンソールポート」と呼ばれるポートを持っています。
+       シスコの機器は「
+       <strong>
+        コンソールポート
+       </strong>
+       」と呼ばれるポートを持っています。
 コンソールポートの見た目はLANケーブルをさすポートと同じかたちなので大差ありませんが、
 ポートの上か下に「Console」などと書かれています。
       </p>
@@ -306,7 +305,11 @@ Ciscoのルーターやスイッチも同様で、この両者に違いはあり
 コンソールを使って初期設定を施す必要があります。
       </p>
       <p>
-       シリアルを使った機器操作で気をつけないといけないのは「ボーレート」と呼ばれる通信速度です。
+       シリアルを使った機器操作で気をつけないといけないのは「
+       <strong>
+        ボーレート
+       </strong>
+       」と呼ばれる通信速度です。
 通信をする双方の機器で揃える必要があるのですが、勝手に相手にあわせるということはしないため、
 双方で同じ速度を設定する必要があります。
 Cisco側のデフォルトは9600bpsですので、操作端末側も同じ9600を設定します。
@@ -314,7 +317,7 @@ Cisco側のデフォルトは9600bpsですので、操作端末側も同じ9600�
       <p>
        コンソールを使った操作は機器のコンソールに直結する必要があり若干面倒なため、
 初期設定でリモートログインできるようにしたあとは「SSHを使って機器に接続することが一般的」です。
-現在のCisco機器で暗号化されていないTelnetを使う理由はないため、
+現在のCisco機器で通信が暗号化されていないTelnetを使う理由はないため、
 可能な限りはSSHのみを使うようにしてください。
       </p>
       <h3 id="header-4">
@@ -331,6 +334,9 @@ Cisco側のデフォルトは9600bpsですので、操作端末側も同じ9600�
 全く知識がない場合はモードの多さにぎょっとするかもしれませんが、操作しているうちに慣れてきます。
 機器の状態を確認したり、設定をする場合には「今はどのモードにいるのか」ということを意識してください。
       </p>
+      <h4>
+       図: モードの遷移
+      </h4>
       <p class="blog-img">
        <img alt="image" class="img-responsive" src="./0020_image/02.png"/>
       </p>
@@ -376,6 +382,9 @@ Cisco側のデフォルトは9600bpsですので、操作端末側も同じ9600�
        本ページでは以下のような構成を使います。
 ルーター2台を直接接続し、それぞれの物理インターフェースにIPを設定して通信をさせます。
       </p>
+      <h4>
+       図: 操作サンプルで使う構成
+      </h4>
       <p class="blog-img">
        <img alt="image" class="img-responsive" src="./0020_image/03.png"/>
       </p>
@@ -407,7 +416,7 @@ Press RETURN to get started!
       </div>
       <p>
        コンソールログインはデフォルトではパスワードを求められません。
-先に説明した一般ユーザーモードとしてログインされます。
+先に説明したユーザーモードとしてログインされます。
       </p>
       <div class="codehilite">
        <pre><span></span>Router&gt;
@@ -415,7 +424,7 @@ Press RETURN to get started!
       </div>
       <p>
        一般ユーザーモードにいるか管理者モードにいるかはプロンプトで分かります。
-機器名の横に「
+ホスト名(デフォルトはRouter)の横に「
        <strong>
         &gt;
        </strong>
@@ -427,7 +436,7 @@ Press RETURN to get started!
 パスワードの設定をすることが推奨されます。
       </p>
       <p>
-       ログアウトをするには「
+       ユーザーモードからログアウトをするには「
        <strong>
         exit
        </strong>
@@ -459,11 +468,18 @@ Router#
         #
        </strong>
        」に変わりました。
-デフォルトでは特権モードへの移行はパスワードなしで実現できます。
-ただ、本番環境で使っている機器ではセキュリティ上望ましくないので、パスワードを設定します。
+設定がされていないデフォルト状態では特権モードへの移行はパスワードなしで実現できます。
+本番環境で使っている機器では誰でも管理者として機器を操作できる状態はセキュリティ上望ましくありません。
+必ずパスワードを設定してください。
+      </p>
+      <h4>
+       図: ユーザーモードと特権モード
+      </h4>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0020_image/04.png"/>
       </p>
       <h3 id="header-9">
-       特権モードから一般ユーザーモードへの移行
+       特権モードからユーザーモードへの移行
       </h3>
       <p>
        特権モードからユーザーモードに移るには「
@@ -474,7 +490,7 @@ Router#
 ただ、管理者がユーザーモードを利用する理由はないため、あまり利用されません。
       </p>
       <div class="codehilite">
-       <pre><span></span>Router#diable
+       <pre><span></span>Router#disable
 Router&gt;
 </pre>
       </div>
@@ -483,46 +499,63 @@ Router&gt;
 ユーザーモードを経由せずにログアウトします。
       </p>
       <h3 id="header-10">
-       管理者モードから設定モード
+       特権モードから設定モードへの移行
       </h3>
       <p>
-       次にルーターの設定をします。
-管理者モードから設定モードに移行するには「
+       ルーターの設定をするために、管理者モードから設定モードに移行します。
+これには「
        <strong>
         configure terminal
        </strong>
        」コマンドを入力します。
-そうするとプロンプトが代わり、機器の設定ができるようになりました。
       </p>
       <div class="codehilite">
-       <pre><span></span>Router# configure terminal
+       <pre><span></span>Router#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
 Router(config)#
 </pre>
       </div>
       <p>
-       このモードは主に機器の設定を変更するためのモードであるため、
+       プロンプトが「ホスト名#」から「ホスト名(config)#」に代わり、
+機器の設定ができるようになりました。
+移行するタイミングで「Enter configuration commands, one per line.  End with CNTL/Z.」というメッセージも出力されています。
+      </p>
+      <p>
+       設定モードは主に機器の設定を変更するためのモードであるため、
 変更操作をしない場合には入らないようにしてください。
-機器のチェックなどは管理者モードで行います。
+複数の機器を操作している際に変更している機器以外は管理者モードにしておけば、
+間違った機器に変更を加えてしまうといったリスクを避けられます。
+      </p>
+      <p>
+       また、単純に設定モードだと機器の状態確認をやり辛くなります。
+これについては後述じます。
       </p>
       <h3 id="header-11">
        設定モード間の移動
       </h3>
       <p>
-       「
+       設定モードには「グローバル設定モード」と特定の機能の設定モードがあります。
+「configure terminal」をした直後はグローバル設定モードになっています。
+      </p>
+      <p>
+       特定機能の設定モードに移るためには、その設定をするためのコマンドを入力します。
+たとえば設定モードから「インターフェース設定モード」に移るには
+「
        <strong>
         interface &lt;設定したいインターフェース名&gt;
        </strong>
-       」とすることで、
-設定モードから「インターフェース設定モード」に移ります。
-      </p>
-      <p>
-       設定モードの種類に応じて、プロンプトが若干変わります。
+       」とします。
+今回は「GigabitEthernet0/1」というインターフェースを設定します。
       </p>
       <div class="codehilite">
        <pre><span></span>R1(config)#interface GigabitEthernet0/1
 R1(config-if)#
 </pre>
       </div>
+      <p>
+       設定モードの種類に応じて、プロンプトが変わります。
+これから現在どの設定モードにいるのかが判断できます。
+      </p>
       <p>
        特定の設定モードからグローバル設定モードに戻るには「exit」コマンドを利用します。
       </p>
@@ -532,19 +565,32 @@ R1(config)#
 </pre>
       </div>
       <p>
-       特定の設定モードから別の設定モードに移るには、
+       特定の設定モードから別の特定の設定モードに移るには、
 必ずしもグローバル設定モードを経由する必要はありません。
-たとえばインターフェース設定モードからOSPF設定モードに直接移行することもできます。
+      </p>
+      <p>
+       たとえばインターフェース設定モードからOSPF設定モードに直接移行することもできます。
       </p>
       <div class="codehilite">
-       <pre><span></span>
+       <pre><span></span>R1(config)#interface gigabitEthernet 0/1
+R1(config-if)#router ospf 1
+R1(config-router)#
 </pre>
       </div>
+      <p>
+       これらのモードやコマンドの意味については後ほど扱います。
+      </p>
+      <h4>
+       図: グローバル設定モードと項目ごとの設定モード
+      </h4>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0020_image/05.png"/>
+      </p>
       <h3 id="header-12">
        設定モードから管理者モードへの戻り方
       </h3>
       <p>
-       設定が完了したので、設定モードから管理者モードに戻ります。
+       設定モードから管理者モードに戻るには2種類の方法があります。
 「
        <strong>
         exit
@@ -556,14 +602,73 @@ R1(config)#
        </strong>
        」コマンドで一気に管理者モードまで戻るという動作をします。
       </p>
+      <p>
+       OSPF設定モードにいた場合にexitを入力すると、グローバル設定モードに戻り、
+グローバル設定モードでexitを入力すると管理者モードに戻ります。
+      </p>
       <div class="codehilite">
-       <pre><span></span>R1(config-if)#exit
-R1(config)#end
+       <pre><span></span>R1(config-router)#exit
+R1(config)#exit
 R1#
-*Oct 25 00:15:17.728: %SYS-5-CONFIG_I: Configured from console by console
+</pre>
+      </div>
+      <p>
+       一方、endコマンドを使うとどのような設定モードであったとしても、
+グローバル設定モードを経ずに管理者モードに戻ります。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>R1(config-if)#end
+R1#
 </pre>
       </div>
       <h2 id="header-13">
+       コマンドの補完と省略
+      </h2>
+      <p>
+       コマンドの入力は必ずしも全てを手で入力する必要はありません。
+入力中にタブを押すことで補間をしたり、候補が複数ある場合はそれを表示することができます。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>R1&gt;en [Tabボタンを押す]
+R1&gt;enable
+</pre>
+      </div>
+      <p>
+       上記はユーザーモードで「en」と入力したあとでTabボタンを押した際の動きです。
+ユーザーモードで「en」から始まるコマンドが「enable」しかないため、そのコマンドが全て補間されています。
+      </p>
+      <p>
+       「e」だけだとコマンドが特定できないため、補間が働きません。
+その場合は「?」で入力候補を表示させられます。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>R1&gt;e [Tabボタンを押す]
+R1&gt;e
+R1&gt;e?
+enable  ethernet  exit  
+
+R1&gt;e
+</pre>
+      </div>
+      <p>
+       eから始まる候補が3つあり、それが列挙されています。
+続く文字を入力することでコマンドを特定できるようにしてください。
+      </p>
+      <p>
+       補間でコマンドを完成させられる状態であれば、
+補完をしなくてもコマンドを発行することができます。
+たとえば「enable」の代わりに「en」と入力することで管理者モードに移ることができます。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>R1&gt;en
+R1#
+</pre>
+      </div>
+      <p>
+       長いコマンドを全て入力するのは手間ですし、なにより覚えきれていないことが多いです。
+タブや?を使うことで操作の負担を減らして下さい。
+      </p>
+      <h2 id="header-14">
        showコマンドでの状態確認
       </h2>
       <p>
@@ -573,51 +678,89 @@ R1#
         show
        </strong>
        」コマンドを利用します。
+showコマンドは主にユーザーモードと管理者モードで利用します。
       </p>
-      <h3 id="header-14">
-       コマンドの補完と省略
-      </h3>
       <p>
-       showコマンドや設定コマンドはタブを押すことで補完したり、候補を確認できます。
+       たとえば機器の現在時刻を確認するコマンド「show clock」をユーザーモードと管理者モードで実行すると以下のようになります。
       </p>
       <div class="codehilite">
-       <pre><span></span>
+       <pre><span></span>R1&gt;show clock   
+*01:06:47.548 UTC Wed Apr 11 2018
+R1&gt;en
+R1#show clock
+*01:06:54.319 UTC Wed Apr 11 2018
+R1#
 </pre>
       </div>
       <p>
-       現在の入力が完全なものでなくても、入力される候補が複数無ければ動作します。
+       showコマンドの一部は管理者モードでは使えるが、ユーザーモードでは使えないようになっています。
+たとえば「show running-config」という機器の設定を全て確認するコマンドは管理者モードでしか使えません。
       </p>
       <div class="codehilite">
-       <pre><span></span>
+       <pre><span></span>R2&gt;show running-config
+         ^
+% Invalid input detected at '^' marker.
+
+R2&gt;
+R2&gt;en
+R2#show running-config
+Building configuration...
+
+Current configuration : 4801 bytes
+!
+! Last configuration change at 23:23:10 UTC Wed Apr 11 2018
+!
+version 15.6
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+...
 </pre>
       </div>
       <h3 id="header-15">
        doコマンド
       </h3>
       <p>
-       設定モードに入るとshowコマンドで状態確認ができなくなります。
+       設定モードは設定変更をするためのモードであるため、
+showコマンドを使うことができません。
       </p>
       <div class="codehilite">
-       <pre><span></span>サンプル
+       <pre><span></span>R2(config)#show clock
+             ^
+% Invalid input detected at '^' marker.
+
+R2(config)#
 </pre>
       </div>
       <p>
-       doコマンドに続けてshowコマンドを続けることで、この制約が解除できます。
+       ただし、「
+       <strong>
+        do
+       </strong>
+       」コマンドに続けてshowコマンドを続けることで、
+設定モードであってもshowコマンドを利用できます。
       </p>
       <div class="codehilite">
-       <pre><span></span>サンプル
+       <pre><span></span>R2(config)#do show clock
+*00:01:52.018 UTC Thu Apr 12 2018
+R2(config)#
 </pre>
       </div>
       <p>
-       ただ、doコマンドを使っているとコマンドの補完ができません。
-コマンドを完全に覚えていない場合は管理者モードに戻ってshowコマンドを実施してください。
+       doコマンドを使うとタブや?が使えないため、
+コマンドを完全に暗記している場合にしか利用できません。
+設定を加えている最中に現在の設定を確認したりすることが多いです。
       </p>
       <h3 id="header-16">
        インターフェースの一覧確認
       </h3>
       <p>
        showコマンドにも体系がありますが、とりあえず使うことを優先して細かな説明は省きます。
-「show ip interface brief」コマンドでルーターのインターフェースの一覧を得ます。
+「
+       <strong>
+        show ip interface brief
+       </strong>
+       」コマンドでルーターのインターフェースの一覧を得ます。
       </p>
       <div class="codehilite">
        <pre><span></span>Router#show ip interface brief
@@ -627,100 +770,131 @@ GigabitEthernet0/1         unassigned      YES unset  administratively down down
 </pre>
       </div>
       <p>
-       インターフェースが2つあり、IPアドレスは設定されておらず、
-状態が「administratively down(明示的にdownさせている)」となっています。
-VIRLではG0/0のインターフェースは機器の管理用に作成されているため、
-トポロジには表示されていません。
-      </p>
-      <p>
-       「configure terminal」で設定モードに入るとshowコマンドで状態確認ができなくなります。
+       この例ではインターフェース「GigabitEthernet0/0」と「GigabitEthernet0/1」があり、
+それぞれのIPアドレスは設定されていません。
+インターフェースの状態が「administratively down(明示的にdownさせている)」となっています。
       </p>
       <h3 id="header-17">
        インターフェースの状態確認
       </h3>
       <p>
-       show int XXXXX
+       個別のインターフェースを確認するには「
+       <strong>
+        show interface &lt;インターフェース名&gt;
+       </strong>
+       」コマンドを使います。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>R2#show interfaces gigabitEthernet 0/1
+GigabitEthernet0/1 is administratively down, line protocol is down
+  Hardware is iGbE, address is fa16.3e49.367e (bia fa16.3e49.367e)
+  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec,
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Auto Duplex, Auto Speed, link type is auto, media type is RJ45
+  output flow-control is unsupported, input flow-control is unsupported
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input never, output never, output hang never
+  Last clearing of "show interface" counters never
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+  5 minute input rate 0 bits/sec, 0 packets/sec
+  5 minute output rate 0 bits/sec, 0 packets/sec
+     0 packets input, 0 bytes, 0 no buffer
+     Received 0 broadcasts (0 IP multicasts)
+     0 runts, 0 giants, 0 throttles
+     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored
+     0 watchdog, 0 multicast, 0 pause input
+     0 packets output, 0 bytes, 0 underruns
+     0 output errors, 0 collisions, 1 interface resets
+     0 unknown protocol drops
+     0 babbles, 0 late collision, 0 deferred
+     0 lost carrier, 0 no carrier, 0 pause output
+     0 output buffer failures, 0 output buffers swapped out
+R2#
+</pre>
+      </div>
+      <p>
+       このコマンドはインターフェースの詳細な状況を確認できます。
+アップしているか否か、IPアドレス、MACアドレス。
+それに加えてどの程度パケットを送受信しているかといったこともわかります。
       </p>
       <h2 id="header-18">
        機器の設定
       </h2>
       <p>
-       管理者モードで「configure terminal」で
-設定モードで設定を加えて、もういちど確認をしたい場合は管理者モードに戻って操作をします。
+       機器を利用するには設定を正しくおこなうことが必要です。
+使う機能により設定が異なるため全てカバーすることはできませんが、
+機器名やインターフェースにIPを設定するといった基本的な内容をここで扱います。
       </p>
       <h3 id="header-19">
-       グローバルコンフィグ
+       ホスト名(グローバル設定モード)
       </h3>
+      <p>
+       グローバル設定モードでは特定の機能に依存しない一般的な設定をします。
+たとえばホスト名の設定などです。
+      </p>
       <p>
        ホスト名の変更は「
        <strong>
         hostname &lt;ホスト名&gt;
        </strong>
        」というコマンドを使います。
-全ての機器の名前が同じだと区別がしにくいため、図と同じ名前であるPC1を設定します。
-プロンプトに表示されていたホスト名が変更されました。
+全ての機器の名前が同じだと区別がしにくいため、図と同じ名前であるR1を設定します。
       </p>
       <div class="codehilite">
-       <pre><span></span>Router(config)#hostname PC1
-PC1(config)#
+       <pre><span></span>Router(config)#hostname R1
+R1(config)#
 </pre>
       </div>
+      <p>
+       プロンプトに表示されていたホスト名が変更されました。
+      </p>
       <h3 id="header-20">
-       設定モード間の移行
+       IPアドレス(インターフェース設定モード)
       </h3>
       <p>
-       次にこのルーターのインターフェースにIPアドレスを与えます。
+       ルーターのインターフェースに設定されるIPは、機器全般の一般的な設定というよりは、
+そのインターフェースの設定です。
+このようなインターフェースやプロトコルといった何かに属する設定は、
+それの設定モードで実施します。
+      </p>
+      <p>
+       インターフェースに設定を加えるのであれば、
 「
        <strong>
         interface &lt;設定したいインターフェース名&gt;
        </strong>
-       」とすることで、
-設定モードから「インターフェース設定モード」に移ります。
+       」としてグローバル設定モードからインターフェース設定モードに移ります。
       </p>
       <div class="codehilite">
        <pre><span></span>R1(config)#interface GigabitEthernet0/1
 R1(config-if)#
 </pre>
       </div>
-      <p>
-       設定が完了したので、設定モードから管理者モードに戻ります。
-「
-       <strong>
-        exit
-       </strong>
-       」コマンドで設定モードから1階層戻るという動きをし、
-「
-       <strong>
-        end
-       </strong>
-       」コマンドで一気に管理者モードまで戻るという動作をします。
+      <h4>
+       図: インターフェースにIPアドレスを設定
+      </h4>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0020_image/06.png"/>
       </p>
-      <div class="codehilite">
-       <pre><span></span>R1(config-if)#exit
-R1(config)#end
-R1#
-*Oct 25 00:15:17.728: %SYS-5-CONFIG_I: Configured from console by console
-</pre>
-      </div>
-      <h3 id="header-21">
-       インターフェース設定モード
-      </h3>
       <p>
-       そして「
+       図にあるように「10.0.0.1/8」という設定を加えます。
+IPを設定するにはインターフェース設定モードで「
        <strong>
         ip address
         <ipアドレス>
          &lt;サブネットマスク&gt;
         </ipアドレス>
        </strong>
-       」とすることで、
-ルーターのインターフェースにIPをふることができます。
-こちらも図の通りに設定しています。
-インターフェースが「admin shut」ですので「
+       」とします。
+そしてダウンさせている設定を「
        <strong>
         no shutdown
        </strong>
-       」でインターフェースをアップさせます。
+       」とすることでアップさせる設定にします。
       </p>
       <div class="codehilite">
        <pre><span></span>R1(config)#interface GigabitEthernet0/1
@@ -739,8 +913,7 @@ R1#
       </p>
       <p>
        再度、インターフェースの状態を「show ip interface brief」コマンドで確認します。
-各コマンドで使われる単語は他に被る単語がない状態であれば、省略可能です。
-そのため「show ip int bri」と入力すれば「show ip interface brief」として動きます。
+そうすると、インターフェースにIPが振られていることが確認できました。
       </p>
       <div class="codehilite">
        <pre><span></span>R1#show ip int bri
@@ -755,19 +928,95 @@ GigabitEthernet0/1         10.0.1.101      YES manual up                    up
 様々なコマンドを打つことで設定はルーターやスイッチに適用されていきますが、
 設定を保存しないと再起動をした際に更新した設定が全て消えています。
       </p>
-      <h2 id="header-22">
+      <h2 id="header-21">
        設定の確認と保存
       </h2>
       <p>
-       Ciscoのルーターやスイッチは「
+       Ciscoのルーターやスイッチに加えた設定は、保存をしないと電源オフや再起動で消えてしまいます。
+正しく設定を保存したり変更するには、どのように設定が扱われているかをきちんと理解する必要があります。
+      </p>
+      <p>
+       設定ファイルには「
        <strong>
-        startupコンフィグ
+        スタートアップコンフィグ(startup-config)
        </strong>
        」と「
        <strong>
-        runningコンフィグ
+        ランニングコンフィグ(running-config)
        </strong>
-       」を持っています。
+       」の2つがあります。
+その名前から分かるようにスタートアップコンフィグは起動時に利用される設定情報で、
+ランニングコンフィグは現在起動しているその機器の設定となります。
+      </p>
+      <h4>
+       図: グローバル設定モードと項目ごとの設定モード
+      </h4>
+      <p class="blog-img">
+       <img alt="image" class="img-responsive" src="./0020_image/07.png"/>
+      </p>
+      <p>
+       Ciscoの機器は起動時にstartup-configに書かれている内容をrunning-configにコピーして、
+「running-config」の設定に書かれているように動作をするようになります。
+      </p>
+      <p>
+       running-configの確認は「
+       <strong>
+        show running-config
+       </strong>
+       」コマンドでおこなえます。
+このコマンドは全ての設定を画面に出力しますが、
+特定の設定だけが必要な場合は「show running-config」に項目を続けます。
+例えば先ほど設定したインターフェースだけの設定を確認することもできます。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>R1#show running-config interface g0/1
+Building configuration...
+
+Current configuration : 109 bytes
+!
+interface GigabitEthernet0/1
+ ip address 10.0.0.1 255.0.0.0
+ duplex auto
+ speed auto
+ media-type rj45
+end
+</pre>
+      </div>
+      <p>
+       自分が設定していないspeedなどの設定も入っていますが、初期値だと思って下さい。
+逆に「no shutdown」などの設定も入っていませんが、それがデフォルト値で省略されているためです。
+      </p>
+      <p>
+       たとえばインターフェースのIPを変更すると、
+このrunning-configの値も変わります。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>R1(config)#int g0/1
+R1(config-if)#ip add 10.0.0.100 255.0.0.0
+R1(config-if)#end
+R1#show run int g0/1
+Building configuration...
+
+Current configuration : 111 bytes
+!
+interface GigabitEthernet0/1
+ ip address 10.0.0.100 255.0.0.0
+ duplex auto
+ speed auto
+ media-type rj45
+end
+
+R1#
+</pre>
+      </div>
+      <p>
+       このrunning-configの設定は保存をしないと機器を停止したり再起動するとなくなってしまいます。
+「
+       <strong>
+        write
+       </strong>
+       」コマンドを使うことでrunning-configの内容を、
+起動時に読み込む設定ファイルであるstartup-configにコピーすることができます。
       </p>
       <div class="codehilite">
        <pre><span></span>R1#write
@@ -779,16 +1028,13 @@ R1#
 </pre>
       </div>
       <p>
-       以上でルーターをPC1として使う設定が完了しました。
-名前とIPを変えた同じ設定をPC2とPC3にも加えて下さい。
+       停止した際にrunning-configの内容を失っても、
+startup-configに同じ内容があるため再起動時にrunning-configにコピーされて同じ状態に戻ります。
       </p>
-      <p>
-       最後にスイッチの設定を変更します。
-      </p>
-      <h2 id="header-23">
+      <h2 id="header-22">
        通信テストをするコマンド
       </h2>
-      <h3 id="header-24">
+      <h3 id="header-23">
        ping
       </h3>
       <div class="codehilite">
@@ -799,36 +1045,121 @@ Sending 5, 100-byte ICMP Echos to 10.0.1.102, timeout is 2 seconds:
 Success rate is 80 percent (4/5), round-trip min/avg/max = 4/4/5 ms
 </pre>
       </div>
-      <h3 id="header-25">
+      <h3 id="header-24">
        traceroute
       </h3>
-      <h2 id="header-26">
-       小ネタ
+      <h2 id="header-25">
+       便利なコマンド
       </h2>
-      <h3 id="header-27">
-       名前解決を防ぐ
+      <h3 id="header-26">
+       間違えたコマンド入力時に名前解決を防ぐ
       </h3>
+      <p>
+       Ciscoの機器は誤ったコマンドを入力した際に名前解決しようとする場合があります。
+      </p>
+      <p>
+       たとえば存在しないコマンド「hello」を入力すると以下のように名前解決をしようとして、
+それに10秒以上は時間を取られます。
+      </p>
       <div class="codehilite">
-       <pre><span></span>no ip domain-lookup
+       <pre><span></span>R1#hello
+Translating "hello"...domain server (255.255.255.255)
+ (255.255.255.255)
+Translating "hello"...domain server (255.255.255.255)
+
+% Bad IP address or host name
+% Unknown command or computer name, or unable to find computer address
+R1#
 </pre>
       </div>
-      <h3 id="header-28">
+      <p>
+       この名前解決を避けるには「
+       <strong>
+        no ip domain-lookup
+       </strong>
+       」コマンドを設定します。
+このコマンドを設定してから「hello」とすると、1秒ほどでレスポンスが戻ってきます。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>R1(config)#no ip domain-lookup
+R1(config)#end
+R1#hello
+Translating "hello"
+
+Translating "hello"
+
+% Bad IP address or host name
+% Unknown command or computer name, or unable to find computer address
+</pre>
+      </div>
+      <h3 id="header-27">
        出力割り込み時に再表示
       </h3>
+      <p>
+       機器を操作している最中にリンクアップやダウンなどが発生すると、
+そのイベント出力文字と現在のコマンド入力が混ざって操作しにくくなります。
+      </p>
+      <p>
+       これを防ぐためにコンソール及びリモート接続で「
+       <strong>
+        logging synchronous
+       </strong>
+       」と設定すれば、
+機器からの割り込みの出力が発生したとしても次の行に入力中のコマンドが再表示されます。
+      </p>
       <div class="codehilite">
-       <pre><span></span>line con 0
-logging synchronous
-line vty 0 15
-logging synchronous
+       <pre><span></span>R1(config)#line console 0
+R1(config-line)#logging synchronous
+R1(config)#line vty 0 15
+R1(config-line)#logging synchronous
 </pre>
       </div>
-      <h3 id="header-29">
-       出力を中断しない
+      <p>
+       上記は「line console 0」がコンソール接続の設定モードとなり、
+「line vty 0 15」がリモート接続の設定モードとなります。
+      </p>
+      <h3 id="header-28">
+       長い出力をまとめて表示
       </h3>
+      <p>
+       「show running-config」の出力は非常に多くなるため、途中で出力が止まって「--More--」と表示されます。
+これはLinuxのmoreコマンド(lessコマンドとほぼ同じ)と同じく、
+エンターボタンで1行進み、スペースボタンで複数行進みます。
+出力を抜けるにはQuitの「q」を入力します。
+      </p>
       <div class="codehilite">
-       <pre><span></span>terminal length 0
+       <pre><span></span>R1#show running-config
+Building configuration...
+
+Current configuration : 4823 bytes
+!
+! Last configuration change at 00:33:01 UTC Fri Apr 13 2018
+!
+version 15.6
+service timestamps debug datetime msec
+&lt;省略&gt;
+!
+!
+mmi polling-interval 60
+ --More--
 </pre>
       </div>
+      <p>
+       何行出力されるかという設定は「
+       <strong>
+        terminal length
+       </strong>
+       」コマンドで決まります。
+0とすれば全て出力という意味になるため、出力を中断されたくない場合は「terminal length 0」と設定します。
+      </p>
+      <div class="codehilite">
+       <pre><span></span>R1#terminal length 0
+</pre>
+      </div>
+      <p>
+       ただ、このコマンドは機器に対して永続的な設定となるわけではなく、再起動すれば消えてしまいます。
+セッションごとに設定が必要です。
+      </p>
       <!-- GENERATED HTML END -->
       <!-- GENERATED HTML END -->
       <nav>
@@ -974,106 +1305,109 @@ logging synchronous
           Cisco機器の操作方法
          </a>
         </li>
-        <li>
-         <a href="./005.html">
-          同一ネットワーク内のL2転送の仕組み
-         </a>
-        </li>
-        <li>
-         <a href="./006.html">
-          異なるネットワーク間のL3転送の仕組み
-         </a>
-        </li>
-        <li>
-         <a href="./007.html">
-          ルーティングプロトコルによる経路学習
-         </a>
-        </li>
-        <li>
-         <a href="./008.html">
-          その他のルーティングの重要トピック
-         </a>
-        </li>
-        <li>
-         <a href="./009.html">
-          ホストが使うプロトコル
-         </a>
-        </li>
-        <li>
-         <a href="./010.html">
-          VLAN
-         </a>
-        </li>
-        <li>
-         <a href="./011.html">
-          L3スイッチとVLAN間ルーティング
-         </a>
-        </li>
-        <li>
-         <a href="./012.html">
-          リンクの冗長化
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          L2ネットワークの冗長化
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          L2ネットワークの冗長化
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          L3ネットワークの冗長化
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          ACLによるパケットのフィルタ
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          NAT
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          BGPによるAS間接続
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          TCP/IP入門
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          IPアドレスの設計
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          TCPによる輻輳制御
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          IPv6
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          ネットワークの監視
-         </a>
-        </li>
-        <li>
-         <a href="./013.html">
-          パケットのキャプチャ
-         </a>
-        </li>
+        <!--
+
+              <li>
+                <a href="./005.html">
+         同一ネットワーク内のL2転送の仕組み
+        </a>
+              </li>
+              <li>
+                <a href="./006.html">
+         異なるネットワーク間のL3転送の仕組み
+        </a>
+              </li>
+              <li>
+                <a href="./007.html">
+         ルーティングプロトコルによる経路学習
+        </a>
+              </li>
+              <li>
+                <a href="./008.html">
+         その他のルーティングの重要トピック
+        </a>
+              </li>
+              <li>
+                <a href="./009.html">
+         ホストが使うプロトコル
+        </a>
+              </li>
+              <li>
+                <a href="./010.html">
+         VLAN
+        </a>
+              </li>
+              <li>
+                <a href="./011.html">
+         L3スイッチとVLAN間ルーティング
+        </a>
+              </li>
+              <li>
+                <a href="./012.html">
+         リンクの冗長化
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         L2ネットワークの冗長化
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         L2ネットワークの冗長化
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         L3ネットワークの冗長化
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         ACLによるパケットのフィルタ
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         NAT
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         BGPによるAS間接続
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         TCP/IP入門
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         IPアドレスの設計
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         TCPによる輻輳制御
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         IPv6
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         ネットワークの監視
+        </a>
+              </li>
+              <li>
+                <a href="./013.html">
+         パケットのキャプチャ
+        </a>
+              </li>
+              -->
        </ol>
       </div>
       <!-- amazon -->
