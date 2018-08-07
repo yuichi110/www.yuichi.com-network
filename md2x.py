@@ -1020,7 +1020,8 @@ class Md2Html_v0_1:
     def convert_markdown_to_html(self, markdown_text):
         extensions=[
             'markdown.extensions.fenced_code',
-            'markdown.extensions.codehilite'
+            'markdown.extensions.codehilite',
+            'markdown.extensions.tables'
         ]
 
         html = markdown_mod.markdown(markdown_text, extensions=extensions)
